@@ -213,6 +213,11 @@ tr.ex td:first-child,tr.ex td:last-child{opacity:1}
 .tip{background:var(--warn-soft);color:var(--fg);border-radius:8px;padding:9px 11px;font-size:13px;line-height:1.5}
 .tip b{color:var(--warn)}
 .settings .check{justify-content:flex-start;text-align:left}
+.check input{width:auto!important;flex:none}
+.drop.big{justify-items:center;text-align:center;padding:26px 16px;border-width:2px;gap:8px}
+.drop.big .top{justify-content:center;flex-wrap:wrap}
+.drop.big .pick{pointer-events:none;margin-top:4px}
+.upico{width:34px;height:34px;color:var(--peri)}
 .howto{margin:10px 0 0;padding-left:20px;display:grid;gap:10px;font-size:14.5px;max-width:80ch}
 .urlrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
 .urlrow code,.howto code{font:12.5px var(--f-mono);background:var(--sunk);border-radius:6px;padding:4px 7px;overflow-wrap:anywhere;min-width:0}
@@ -286,11 +291,12 @@ tr.ex td:first-child,tr.ex td:last-child{opacity:1}
         <li><b>Open the list in HubSpot.</b> Log in if it asks.
           <div class="urlrow"><a class="btn primary sm" href="https://app.hubspot.com/contacts/5514837/objectLists/13913/filters" target="_blank" rel="noopener">Open the HubSpot list</a><code id="hsUrl">https://app.hubspot.com/contacts/5514837/objectLists/13913/filters</code><button class="btn sm" data-copytext="hsUrl">Copy link</button></div></li>
         <li><b>Click Export</b> (top right of the list). Choose <b>CSV</b> and keep the columns in the current view. They already include the company fields.</li>
-        <li><b>HubSpot emails you a download link.</b> Download the file and drop it below. It's usually named like <code>higher-ed-engagement-for-ai.csv</code>.</li>
+        <li><b>HubSpot emails you a download link.</b> Download the file.</li>
+        <li><b>Upload it here.</b> Click <b>Choose CSV file</b> below, or drag the file onto the box. It's usually named like <code>higher-ed-engagement-for-ai.csv</code>.</li>
       </ol>
       <div id="sampleBanner" class="banner" hidden>Showing made-up example contacts so you can see the plan. Upload your HubSpot export to replace them.</div>
       <div class="uploads" style="margin-top:12px">
-        <label class="drop" id="dropCt"><input type="file" id="fileCt" accept=".csv,text/csv"><div class="top"><h3>Contact list CSV</h3><span class="pill p-other" id="ctPill">Needed</span></div><p class="stat muted" id="ctStat">Drop the HubSpot export here, or tap to choose it.</p></label>
+        <label class="drop big" id="dropCt"><input type="file" id="fileCt" accept=".csv,text/csv"><svg class="upico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-5 5m5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="top"><h3>Upload the contact list CSV</h3><span class="pill p-other" id="ctPill">Needed</span></div><p class="stat muted" id="ctStat">Drag the HubSpot export here, or click the button.</p><span class="btn primary pick">Choose CSV file</span></label>
       </div>
       <div class="settings">
         <div class="field"><label class="label" for="sMin">Contacts per company</label><div style="display:flex;gap:6px;align-items:center"><input id="sMin" type="number" min="1" max="6"><span class="muted">to</span><input id="sMax" type="number" min="1" max="6"></div></div>
@@ -689,7 +695,7 @@ function loadCsv(rows,fields,name){const cols=mapCols(fields,MAP_CT);
   S.contacts=project(rows,cols).filter(p=>p.email||p.first);S.ctFile=name;S.ctCols=cols;ingest();updateDrops();toast(`Loaded ${S.contacts.length.toLocaleString()} contacts at ${S.companies.length.toLocaleString()} companies`)}
 function updateDrops(){const file=S.ctFile,cols=S.ctCols;const miss=NEED_COLS.filter(k=>!cols[k]);
   $("#ctPill").textContent=file?`${S.contacts.length.toLocaleString()} contacts`:S.sample?"Example data":"Needed";$("#ctPill").className="pill "+(file?"p-indep":S.sample?"mined":"p-other");$("#dropCt").classList.toggle("loaded",!!file);
-  $("#ctStat").innerHTML=file?`<b>${esc(file)}</b> · ${S.companies.length.toLocaleString()} companies${miss.length?`<br><span style="color:var(--warn)">Missing columns: ${esc(miss.map(k=>MAP_CT[k][0].replace(/\b\w/g,m=>m.toUpperCase())).join(", "))}. Add them to the list view in HubSpot and export again for better results.</span>`:""}`:"Drop the HubSpot export here, or tap to choose it.";
+  $("#ctStat").innerHTML=file?`<b>${esc(file)}</b> · ${S.companies.length.toLocaleString()} companies${miss.length?`<br><span style="color:var(--warn)">Missing columns: ${esc(miss.map(k=>MAP_CT[k][0].replace(/\b\w/g,m=>m.toUpperCase())).join(", "))}. Add them to the list view in HubSpot and export again for better results.</span>`:""}`:"Drag the HubSpot export here, or click the button.";
   $("#sampleBanner").hidden=!S.sample}
 
 /* ---------- contact research ---------- */
