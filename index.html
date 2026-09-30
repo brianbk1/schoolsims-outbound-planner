@@ -210,6 +210,8 @@ tr.ex td:first-child,tr.ex td:last-child{opacity:1}
 .welcome h1{font-size:26px;margin:4px 0 6px}
 .welcome ol{margin:0;padding-left:20px;display:grid;gap:6px;font-size:14px}
 @media (max-width:760px){.welcome{grid-template-columns:1fr}}
+.tip{background:var(--warn-soft);color:var(--fg);border-radius:8px;padding:9px 11px;font-size:13px;line-height:1.5}
+.tip b{color:var(--warn)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 14px;border-radius:9px;font-weight:600;z-index:60;font-size:14px}
 .empty{padding:28px;text-align:center;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -272,7 +274,7 @@ tr.ex td:first-child,tr.ex td:last-child{opacity:1}
       <summary><span class="label">Step 2a</span><h2>Build the two segments in HubSpot</h2><span class="muted" style="font-size:14px">Paste each prompt into Breeze, then export both segments to CSV</span><span class="chev" aria-hidden="true">›</span></summary>
       <div class="prompts">
         <div class="prompt"><div class="hd"><h3>Company segment prompt</h3><button class="btn sm" data-copy="pCompany">Copy</button></div><pre id="pCompany"></pre></div>
-        <div class="prompt"><div class="hd"><h3>Contact segment prompt</h3><button class="btn sm" data-copy="pContact">Copy</button></div><pre id="pContact"></pre></div>
+        <div class="prompt"><div class="hd"><h3>Contact segment prompt</h3><button class="btn sm" data-copy="pContact">Copy</button></div><pre id="pContact"></pre><div class="tip"><b>If Breeze says it can&#39;t create the segment</b> because the filters exceed the segment builder&#39;s limits and offers to export the audience instead, say yes. A one-time CSV export works the same here. Check it includes Associated Company IDs, Job Title and Email.</div></div>
       </div>
     </details>
     <div class="card" style="margin-top:14px">
@@ -392,6 +394,8 @@ function scoreContact(p){let s=0;const why=[];const tier=tierOf(p.title);p.tier=
   if(p.phone||p.mobile)s+=8;else why.push("No phone on record");
   if(p.email)s+=5;else s-=10;
   if(/unqualified|bad timing|do not/.test(norm(p.leadStatus))){s-=15;why.push(`Lead status: ${p.leadStatus}`)}
+  if(/^(true|yes|1)$/i.test(String(p.unsub||"").trim())){s-=40;why.push("Unsubscribed from email")}
+  if(/customer|evangelist/.test(norm(p.lifecycle))){s-=20;why.push("Customer contact")}
   const lc=daysSince(parseDate(p.lastContacted));if(lc!==null&&lc<=7){s-=10;why.push(`Contacted ${lc}d ago`)}
   p.score=clamp(Math.round(s*1.25),0,100);p.why=why;return p}
 function scoreCompany(c,cts){let s=0;const why=[];const seg=c.seg;
@@ -559,18 +563,18 @@ Exclude companies where:
 
 When the segment is ready, export it to CSV with these properties:
 Record ID, Company name, Company Domain Name, Website URL, Phone Number, City, State/Region, Industry, Type, Lifecycle Stage, Company owner, Number of Employees, Number of Associated Contacts, Number of Associated Deals, Last Activity Date, Last Contacted, Last Engagement Date, Number of times contacted, Number of Pageviews, Time of Last Session.`;
- const ct=`Create an active contact segment named "SchoolSims Outbound Contacts - ${ae}".
+ const ct=`Create a contact segment named "SchoolSims Outbound Contacts - ${ae}". Keep it simple so it stays within the segment builder's limits.
 
 Include contacts where:
-- Associated company is a member of the segment "SchoolSims Outbound - ${ae}"
-- Job title is known
+- Associated company's Company owner is ${ae}
 - Email is known
-- Unsubscribed from all email is NOT true
-- Lead status is NOT Unqualified or Bad Timing
-- Lifecycle stage is NOT Customer
 
-When the segment is ready, export it to CSV (include the associated company column) with these properties:
-Record ID, First Name, Last Name, Email, Phone Number, Mobile Phone Number, Job Title, Company Name, Associated Company IDs, City, State/Region, Lifecycle Stage, Lead Status, Last Activity Date, Last Contacted, Last Engagement Date, Number of times contacted, Marketing emails opened, Marketing emails clicked, Marketing emails replied, Recent Sales Email Opened Date, Recent Sales Email Clicked Date, Recent Sales Email Replied Date, Number of Pageviews, Time of Last Session, LinkedIn URL.`;
+Do not add other filters (no segment-membership filter, lifecycle stage, lead status or unsubscribe filters). The outbound planner matches contacts to the company export and screens lead status itself.
+
+If this still exceeds the segment builder's limits, skip the segment and export the matching contacts directly as a CSV instead.
+
+Export to CSV with the associated company column and these properties:
+Record ID, First Name, Last Name, Email, Phone Number, Mobile Phone Number, Job Title, Company Name, Associated Company IDs, City, State/Region, Lifecycle Stage, Lead Status, Unsubscribed from all email, Last Activity Date, Last Contacted, Last Engagement Date, Number of times contacted, Marketing emails opened, Marketing emails clicked, Marketing emails replied, Recent Sales Email Opened Date, Recent Sales Email Clicked Date, Recent Sales Email Replied Date, Number of Pageviews, Time of Last Session, LinkedIn URL.`;
  $("#pCompany").textContent=co;$("#pContact").textContent=ct}
 
 /* ---------- render ---------- */
