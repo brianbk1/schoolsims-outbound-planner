@@ -223,7 +223,7 @@ tr.ex td:first-child,tr.ex td:last-child{opacity:1}
 
 <main class="wrap">
   <section class="card welcome">
-    <div><span class="label">For Janey</span><h1>Plan your outbound week</h1>
+    <div><span class="label">For Janet</span><h1>Plan your outbound week</h1>
     <p class="muted">About 10 minutes each Monday. Work through the four steps in order; your settings and exclusions stay in this browser for next time.</p></div>
     <ol>
       <li><b>Pipeline target.</b> Enter your open pipeline. You'll get how many companies to work each day.</li>
@@ -250,12 +250,12 @@ tr.ex td:first-child,tr.ex td:last-child{opacity:1}
           <div class="field"><label class="label" for="pPipe">Current open pipeline ($)</label><input id="pPipe" inputmode="numeric" placeholder="Total from HubSpot deals"></div>
           <div class="field"><label class="label" for="pClose">Close rate (%)</label><input id="pClose" inputmode="numeric"></div>
           <div class="field"><label class="label" for="pCycle">Sales cycle (days)</label><input id="pCycle" inputmode="numeric"></div>
-          <div class="field"><label class="label" for="pDeal">Average new deal ($)</label><input id="pDeal" inputmode="numeric"></div>
+          <div class="field"><label class="label" for="pDeal">Average new deal ($)</label><input id="pDeal" inputmode="numeric" placeholder="Required"></div>
           <div class="field"><label class="label" for="pM2o">Meetings that become pipeline (%)</label><input id="pM2o" inputmode="numeric"></div>
           <div class="field"><label class="label" for="pA2m">Accounts worked that book a meeting (%)</label><input id="pA2m" inputmode="numeric"></div>
           <div class="field"><label class="label" for="pLowW">Slow-month close volume (% of normal)</label><input id="pLowW" inputmode="numeric"></div>
           <div class="field full"><span class="label">Slow closing months</span><div class="months" id="pLow"></div></div>
-          <div class="field"><label class="label" for="sAe">Your name</label><input id="sAe" placeholder="Janey"></div>
+          <div class="field"><label class="label" for="sAe">Your name</label><input id="sAe" placeholder="Janet"></div>
           <div class="field"><label class="label" for="sPhone">Your phone (for voicemails)</label><input id="sPhone" placeholder="610-555-0100"></div>
           <div class="field"><label class="label" for="sTz">Your time zone</label><select id="sTz"></select></div>
           <div class="field"><label class="label" for="sWeek">Plan week starting (Monday)</label><input id="sWeek" type="date"></div>
@@ -372,10 +372,11 @@ const TARGETS={k12:["Assistant Superintendent for Curriculum & Instruction","Dir
 
 /* ---------- state ---------- */
 const S={companies:[],contacts:[],sample:true,coFile:null,ctFile:null,coCols:{},ctCols:{},mined:store.get("mined",{}),excluded:store.get("excluded",{}),
-  settings:Object.assign({ae:"Janey",phone:"",tz:"America/New_York",week:nextMonday(),per:5,min:2,max:4,owner:"all",cust:true,recent:true,
-    goal:350000,pipe:0,close:40,cycle:90,deal:20000,m2o:60,a2m:10,lowW:25,low:[11,6,7],perOverride:null},store.get("settings",{})),
+  settings:Object.assign({ae:"Janet",phone:"",tz:"America/New_York",week:nextMonday(),per:5,min:2,max:4,owner:"all",cust:true,recent:true,
+    goal:350000,pipe:0,close:40,cycle:90,deal:0,m2o:60,a2m:10,lowW:25,low:[11,6,7],perOverride:null},store.get("settings",{})),
   step:1,tab:"plan",day:0,plan:null,engine:"roles",finding:false,rf:"all",q:""};
 if(S.settings.week<nextMonday())S.settings.week=nextMonday();
+if(!S.settings.v2){if(S.settings.ae==="Janey")S.settings.ae="Janet";if(+S.settings.deal===20000)S.settings.deal=0;S.settings.v2=true;store.set("settings",S.settings)}
 
 /* ---------- scoring ---------- */
 function isCustomer(c){return /customer|evangelist/.test(norm(c.lifecycle+" "+c.type))}
@@ -450,16 +451,16 @@ function calc(){const st=S.settings;const start=new Date(st.week+"T12:00:00");co
   const W=months.reduce((a,m)=>a+m.w,0)||1;let cur=pipe;
   months.forEach(m=>{m.quota=goal*m.w/W;m.need=m.quota/close;m.cov=Math.min(cur,m.need);cur-=m.cov;m.gap=m.need-m.cov;m.createIdx=Math.max(0,m.i-lag);m.behind=m.i<lag&&m.gap>0.5});
   const create=Array(12).fill(0);months.forEach(m=>create[m.createIdx]+=m.gap);months.forEach((m,i)=>m.create=create[i]);
-  const need=goal/close,gap=Math.max(0,need-pipe);const month=create[0],wk=month/4.33,opps=wk/Math.max(1,+st.deal||1),mtgs=opps/(clamp(+st.m2o||1,1,100)/100),accts=mtgs/(clamp(+st.a2m||1,1,100)/100),raw=accts/5;
-  return{months,need,gap,month,wk,opps,mtgs,accts,raw,rec:clamp(Math.ceil(raw-1e-9),2,15),lag,pipe,goal}}
+  const need=goal/close,gap=Math.max(0,need-pipe);const month=create[0],wk=month/4.33,noDeal=!(+st.deal>0),opps=noDeal?null:wk/(+st.deal),mtgs=noDeal?null:opps/(clamp(+st.m2o||1,1,100)/100),accts=noDeal?null:mtgs/(clamp(+st.a2m||1,1,100)/100),raw=noDeal?null:accts/5;
+  return{months,need,gap,month,wk,opps,mtgs,accts,raw,noDeal,rec:noDeal?5:clamp(Math.ceil(raw-1e-9),2,15),lag,pipe,goal}}
 function renderCalc(){const st=S.settings,r=S.calc||calc();
-  const notes=[];if(!r.pipe)notes.push(`<div class="warnbox">Current pipeline is $0. Enter your open pipeline total from HubSpot deals to get an accurate number.</div>`);
+  const notes=[];if(r.noDeal)notes.push(`<div class="warnbox"><b>Enter your average new deal size</b> to calculate companies per day. The plan uses 5 a day until you do.</div>`);if(!r.pipe)notes.push(`<div class="warnbox">Current pipeline is $0. Enter your open pipeline total from HubSpot deals to get an accurate number.</div>`);
   if(r.pipe&&r.month<1)notes.push(`<div class="okbox">Current pipeline covers the next ${r.lag} months of closes. Keep a baseline of 2 companies a day.</div>`);
   const behind=r.months.filter(m=>m.behind);if(behind.length)notes.push(`<div class="warnbox">${behind.map(m=>m.label).join(", ")} ${behind.length>1?"are":"is"} short of pipeline inside the ${st.cycle}-day cycle. That shortfall is added to this month's target, and those months are at risk.</div>`);
-  if(r.raw>10)notes.push(`<div class="warnbox">The math asks for ${Math.ceil(r.raw)} companies a day. Alongside renewal and upsell work, about 10 is a practical ceiling. Marketing-sourced meetings, a larger average deal or better conversion would close the rest.</div>`);
+  if(r.raw!==null&&r.raw>10)notes.push(`<div class="warnbox">The math asks for ${Math.ceil(r.raw)} companies a day. Alongside renewal and upsell work, about 10 is a practical ceiling. Marketing-sourced meetings, a larger average deal or better conversion would close the rest.</div>`);
   const cm=r.months[0].label.split(" ")[0],closeM=r.months[Math.min(11,r.lag)].label.split(" ")[0];
   $("#calcOut").innerHTML=`<div><span class="label">Companies to work per day</span><div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-top:4px"><span class="big">${st.per}</span><span class="muted">${st.per*st.min}-${st.per*st.max} contacts a day · ${st.per*5} companies a week${st.perOverride?" · manual override":""}</span></div></div>
-  <div class="chain"><div><span>Pipeline needed (${kfmt(r.goal)} ÷ ${st.close}%)</span><b>${money(r.need)}</b></div><div><span>Minus current pipeline</span><b>${money(r.pipe)}</b></div><div><span>Still to create over 12 months</span><b>${money(r.gap)}</b></div><div><span>To create in ${cm} (for ${closeM} closes, plus any shortfall)</span><b>${money(r.month)}</b></div><div><span>Per week</span><b>${money(r.wk)}</b></div><div><span>New opportunities a week (÷ ${kfmt(+st.deal)})</span><b>${r.opps.toFixed(1)}</b></div><div><span>Meetings a week (÷ ${st.m2o}%)</span><b>${r.mtgs.toFixed(1)}</b></div><div><span>Accounts to work a week (÷ ${st.a2m}%)</span><b>${Math.round(r.accts)}</b></div><div><span>Per day, rounded up (2 to 15)</span><b>${r.rec}</b></div></div>
+  <div class="chain"><div><span>Pipeline needed (${kfmt(r.goal)} ÷ ${st.close}%)</span><b>${money(r.need)}</b></div><div><span>Minus current pipeline</span><b>${money(r.pipe)}</b></div><div><span>Still to create over 12 months</span><b>${money(r.gap)}</b></div><div><span>To create in ${cm} (for ${closeM} closes, plus any shortfall)</span><b>${money(r.month)}</b></div><div><span>Per week</span><b>${money(r.wk)}</b></div><div><span>New opportunities a week (÷ ${r.noDeal?"average deal":kfmt(+st.deal)})</span><b>${r.noDeal?"—":r.opps.toFixed(1)}</b></div><div><span>Meetings a week (÷ ${st.m2o}%)</span><b>${r.noDeal?"—":r.mtgs.toFixed(1)}</b></div><div><span>Accounts to work a week (÷ ${st.a2m}%)</span><b>${r.noDeal?"—":Math.round(r.accts)}</b></div><div><span>Per day, rounded up (2 to 15)</span><b>${r.noDeal?"—":r.rec}</b></div></div>
   ${notes.join("")}
   <div class="field"><label class="label" for="pOver">Override companies per day</label><div style="display:flex;gap:8px"><input id="pOver" type="number" min="1" max="15" placeholder="Using ${r.rec}" value="${st.perOverride??""}" style="max-width:120px"><button class="btn sm" id="pOverClr" ${st.perOverride?"":"hidden"}>Use ${r.rec}</button></div></div>`;
   const max=Math.max(...r.months.map(m=>m.create),1);
@@ -543,7 +544,7 @@ IF CONNECTED ON CALL 1: skip call 2 and the voicemail, send a recap email with t
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 
 /* ---------- HubSpot prompts ---------- */
-function prompts(){const ae=S.settings.ae||"Janey";
+function prompts(){const ae=S.settings.ae||"Janet";
  const co=`Create an active company segment named "SchoolSims Outbound - ${ae}".
 
 Include companies where:
@@ -719,7 +720,7 @@ function buildWorkbook(){const P=S.plan,st=S.settings,tz=st.tz;const wb=XLSX.uti
    ["HOW ACCOUNTS WERE CHOSEN"],["Priority score blends segment fit, recent account and contact engagement (email opens, clicks, replies, site visits), whether a decision maker is on file, and how long since anyone reached out. Customers and accounts touched in the last 7 days are left out."],
    ["Contacts are ranked by persona (decision maker, champion, influencer), engagement and whether a phone number is on file. 2 to 4 per account."]];
   const ws0=sheet(intro,[140],{header:-1});["A1","A4","A13","A17"].forEach(a=>{ws0[a].s={font:{bold:true,sz:a==="A1"?16:12,color:{rgb:a==="A1"?"2D2B6F":"9F354F"}}}});XLSX.utils.book_append_sheet(wb,ws0,"Start Here");
-  const r=S.calc||calc();const pm=[["Pipeline math",""],["Annual sales goal",r.goal],["Close rate",st.close/100],["Pipeline needed for the year",Math.round(r.need)],["Current open pipeline",r.pipe],["Pipeline still to create",Math.round(r.gap)],["Sales cycle (days)",+st.cycle],["To create this month",Math.round(r.month)],["Per week",Math.round(r.wk)],["Average new deal",+st.deal],["New opportunities a week",+r.opps.toFixed(1)],["Meetings that become pipeline",st.m2o/100],["Meetings a week",+r.mtgs.toFixed(1)],["Accounts worked that book a meeting",st.a2m/100],["Accounts to work a week",Math.round(r.accts)],["Recommended companies a day",r.rec],["Companies a day used in this plan",st.per],["Slow months",st.low.map(i=>MON[i]).join(", ")+` at ${st.lowW}% of normal`],["",""],["Month","Close target","Pipeline needed","Covered by current pipeline","Still needed","Create by","Pipeline to create in this month"]];
+  const r=S.calc||calc();const pm=[["Pipeline math",""],["Annual sales goal",r.goal],["Close rate",st.close/100],["Pipeline needed for the year",Math.round(r.need)],["Current open pipeline",r.pipe],["Pipeline still to create",Math.round(r.gap)],["Sales cycle (days)",+st.cycle],["To create this month",Math.round(r.month)],["Per week",Math.round(r.wk)],["Average new deal",+st.deal||"Not entered"],["New opportunities a week",r.noDeal?"Enter average deal":+r.opps.toFixed(1)],["Meetings that become pipeline",st.m2o/100],["Meetings a week",r.noDeal?"":+r.mtgs.toFixed(1)],["Accounts worked that book a meeting",st.a2m/100],["Accounts to work a week",r.noDeal?"":Math.round(r.accts)],["Recommended companies a day",r.noDeal?"Enter average deal (using 5)":r.rec],["Companies a day used in this plan",st.per],["Slow months",st.low.map(i=>MON[i]).join(", ")+` at ${st.lowW}% of normal`],["",""],["Month","Close target","Pipeline needed","Covered by current pipeline","Still needed","Create by","Pipeline to create in this month"]];
   r.months.forEach(m=>pm.push([m.label+(st.low.includes(m.mi)?" (slow)":""),Math.round(m.quota),Math.round(m.need),Math.round(m.cov),Math.round(m.gap),m.gap>0.5?(m.behind?"Now (behind)":r.months[m.createIdx].label):"",Math.round(m.create)]));
   const wsP=sheet(pm,[36,16,16,22,14,14,26],{header:19});
   for(let i=1;i<19;i++){const c=wsP["B"+(i+1)];if(!c||typeof c.v!=="number")continue;const lbl=pm[i][0];c.z=/rate|become|book/i.test(lbl)?"0%":/deal|goal|pipeline|create|week$|month$/i.test(lbl)&&!/opportunit|meeting|accounts|companies|days/i.test(lbl)?'"$"#,##0':"0.0"}
