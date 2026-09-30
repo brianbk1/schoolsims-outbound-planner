@@ -371,7 +371,7 @@ function project(rows,cols){return rows.map(r=>{const o={};for(const[f,h]of Obje
 const SEG={k12:"K-12 District",higher:"Higher Ed",indep:"Independent School",cte:"CTE / Workforce",other:"Other"};
 function segOf(c){const t=norm([c.name,c.industry,c.type].join(" "));const dom=(c.dom||"").toLowerCase();
   if(/career|technical|vocational|\bcte\b|boces|workforce|tech center|joint vocational/.test(t))return"cte";
-  if(/school district|public schools|\bisd\b|\busd\b|county schools|city schools|unified|consolidated|k12|k 12|board of education|regional school|parish schools|area schools|community schools|township|primary secondary|geographic district|school system|department of education|school district/.test(t))return"k12";
+  if(/school district|public schools|\bisd\b|\busd\b|county schools|city schools|unified|consolidated|k12|k 12|board of education|regional school|parish schools|area schools|community schools|township|primary secondary|geographic district|school system|department of education|central schools|charter|school district/.test(t))return"k12";
   if(/college|university|institute|higher education|higher ed|school of education/.test(t)||/\.edu$/.test(dom))return"higher";
   if(/academy|day school|country day|preparatory|\bprep\b|friends school|episcopal|montessori|independent|\bschool\b/.test(t))return"indep";
   if(/education/.test(t))return"k12";return"other"}
@@ -462,7 +462,8 @@ function ingest(){const by=new Map();
   const co=[...by.values()];co.forEach(c=>{c.dom=(c.domain||Object.entries(c.doms).sort((a,b)=>b[1]-a[1])[0]?.[0]||"").toLowerCase().replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/.*$/,"");
     c.st=stateCode(c.city)||stateCode(c.cts.find(p=>p.state)?.state);c.intl=!!c.country&&!/united states|^usa?$/i.test(c.country);
     c.tz=TZ[c.st]||areaTz(c.phone)||areaTz(c.cts.find(p=>p.phone)?.phone)||"";
-    c.seg=segOf(c);const hi=c.cts.filter(p=>p.fnG==="Higher ed").length;if(hi>c.cts.length/2&&c.seg!=="cte")c.seg="higher";if(c.seg==="other"&&c.cts.some(p=>p.fnG==="Independent school leadership"))c.seg="indep";
+    c.seg=segOf(c);const cnt=g=>c.cts.filter(p=>p.fnG===g).length;const hi=cnt("Higher ed");if(hi>c.cts.length/2&&c.seg!=="cte")c.seg="higher";
+    if(c.seg==="other"){if(cnt("Independent school leadership"))c.seg="indep";else if(/\.k12\.|k12|schools?\.(org|net|us|com)$|(ps|sd|isd|usd|csd|cps)\.(org|net|us|com)$|\.edu$/.test(c.dom)||cnt("District leadership")+cnt("Building leadership")+cnt("Professional development")>c.cts.length/2)c.seg=/\.edu$/.test(c.dom)&&hi?"higher":"k12"}
     c.flag=companyFlag(c);scoreCompany(c)});
   S.companies=co;
   const owners=[...new Set(co.map(c=>c.owner).filter(Boolean))].sort();
@@ -473,7 +474,7 @@ function ingest(){const by=new Map();
 /* ---------- plan ---------- */
 const WIN={k12:{am:[450,510,"Before first bell"],pm:[930,1005,"After dismissal"]},cte:{am:[450,510,"Before first bell"],pm:[930,1005,"After dismissal"]},indep:{am:[465,510,"Before first period"],pm:[930,1005,"After last period"]},higher:{am:[570,660,"Mid-morning, before class blocks"],pm:[840,960,"Afternoon office hours"]},other:{am:[540,600,"Mid-morning"],pm:[840,900,"Mid-afternoon"]}};
 function minedFor(c){return(S.mined[c.key]||[]).map(m=>Object.assign({},m,{key:"m:"+c.key+":"+norm(m.first+m.last+m.title),isMined:true,co:c.key,tier:tierOf(m.title),score:clamp(tierOf(m.title)===1?62:tierOf(m.title)===2?52:35,0,100),why:["Found by contact research","Verify before outreach"]}))}
-function autoReason(c){const st=S.settings;if(st.cust&&c.flag)return c.flag[1];if(st.recent&&c.touch!==null&&c.touch<=7)return`Worked ${c.touch}d ago`;if(st.owner==="__none"&&c.owner)return"Has an owner";if(st.owner!=="all"&&st.owner!=="__none"&&c.owner!==st.owner)return"Different owner";if(!c.use.length)return"No usable contacts";return""}
+function autoReason(c){const st=S.settings;if(!["k12","indep","higher"].includes(c.seg))return c.seg==="cte"?"CTE center (not K-12, independent or higher ed)":"Not a K-12, independent school or higher ed account";if(st.cust&&c.flag)return c.flag[1];if(st.recent&&c.touch!==null&&c.touch<=7)return`Worked ${c.touch}d ago`;if(st.owner==="__none"&&c.owner)return"Has an owner";if(st.owner!=="all"&&st.owner!=="__none"&&c.owner!==st.owner)return"Different owner";if(!c.use.length)return"No usable contacts";return""}
 function eligible(){return S.companies.filter(c=>!autoReason(c)&&!S.excluded[c.key]).sort((a,b)=>b.score-a.score)}
 function build(){const st=S.settings;S.calc=calc();st.per=st.perOverride||S.calc.rec;const el=eligible();const picks=el.slice(0,st.per*5);
   const days=DOW.map((d,i)=>({i,date:addDays(st.week,i),accts:[]}));
