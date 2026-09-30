@@ -212,6 +212,16 @@ tr.ex td:first-child,tr.ex td:last-child{opacity:1}
 @media (max-width:760px){.welcome{grid-template-columns:1fr}}
 .tip{background:var(--warn-soft);color:var(--fg);border-radius:8px;padding:9px 11px;font-size:13px;line-height:1.5}
 .tip b{color:var(--warn)}
+.settings .check{justify-content:flex-start;text-align:left}
+.howto{margin:10px 0 0;padding-left:20px;display:grid;gap:10px;font-size:14.5px;max-width:80ch}
+.urlrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.urlrow code,.howto code{font:12.5px var(--f-mono);background:var(--sunk);border-radius:6px;padding:4px 7px;overflow-wrap:anywhere;min-width:0}
+.urlrow code{flex:1 1 260px}
+.gapgrid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;margin-top:12px}
+@media (max-width:700px){.gapgrid{grid-template-columns:1fr}}
+.need{display:grid;gap:4px;margin-top:8px}
+.need .nt{font-size:13.5px}.need .nt a{color:var(--peri)}
+.act-need{background:var(--maroon-soft);color:var(--maroon);justify-self:start}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 14px;border-radius:9px;font-weight:600;z-index:60;font-size:14px}
 .empty{padding:28px;text-align:center;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -229,7 +239,7 @@ tr.ex td:first-child,tr.ex td:last-child{opacity:1}
     <p class="muted">About 10 minutes each Monday. Work through the four steps in order; your settings and exclusions stay in this browser for next time.</p></div>
     <ol>
       <li><b>Pipeline target.</b> Enter your open pipeline. You'll get how many companies to work each day.</li>
-      <li><b>HubSpot export.</b> Copy the two prompts into Breeze, export both segments to CSV, and upload them here.</li>
+      <li><b>HubSpot export.</b> Open the SchoolSims contact list in HubSpot, export it to CSV, and upload the file here.</li>
       <li><b>Review accounts.</b> Uncheck anything you shouldn't call, like an account in a renewal conversation.</li>
       <li><b>Weekly plan.</b> Follow the day's schedule, tap a contact for scripts, and download the .xlsx.</li>
     </ol>
@@ -270,24 +280,22 @@ tr.ex td:first-child,tr.ex td:last-child{opacity:1}
   </section>
 
   <section id="step2" class="stepview" hidden>
-    <details class="card" id="promptCard" open>
-      <summary><span class="label">Step 2a</span><h2>Build the two segments in HubSpot</h2><span class="muted" style="font-size:14px">Paste each prompt into Breeze, then export both segments to CSV</span><span class="chev" aria-hidden="true">›</span></summary>
-      <div class="prompts">
-        <div class="prompt"><div class="hd"><h3>Company segment prompt</h3><button class="btn sm" data-copy="pCompany">Copy</button></div><pre id="pCompany"></pre></div>
-        <div class="prompt"><div class="hd"><h3>Contact segment prompt</h3><button class="btn sm" data-copy="pContact">Copy</button></div><pre id="pContact"></pre><div class="tip"><b>If Breeze says it can&#39;t create the segment</b> because the filters exceed the segment builder&#39;s limits and offers to export the audience instead, say yes. A one-time CSV export works the same here. Check it includes Associated Company IDs, Job Title and Email.</div></div>
-      </div>
-    </details>
-    <div class="card" style="margin-top:14px">
-      <div class="shd"><span class="label">Step 2b</span><h2>Upload the two exports</h2></div>
-      <div id="sampleBanner" class="banner" hidden>Showing example accounts and people so you can see the plan. Upload your HubSpot CSVs to replace them.</div>
+    <div class="card">
+      <div class="shd"><span class="label">Step 2</span><h2>Download the contact list from HubSpot</h2></div>
+      <ol class="howto">
+        <li><b>Open the list in HubSpot.</b> Log in if it asks.
+          <div class="urlrow"><a class="btn primary sm" href="https://app.hubspot.com/contacts/5514837/objectLists/13913/filters" target="_blank" rel="noopener">Open the HubSpot list</a><code id="hsUrl">https://app.hubspot.com/contacts/5514837/objectLists/13913/filters</code><button class="btn sm" data-copytext="hsUrl">Copy link</button></div></li>
+        <li><b>Click Export</b> (top right of the list). Choose <b>CSV</b> and keep the columns in the current view. They already include the company fields.</li>
+        <li><b>HubSpot emails you a download link.</b> Download the file and drop it below. It's usually named like <code>higher-ed-engagement-for-ai.csv</code>.</li>
+      </ol>
+      <div id="sampleBanner" class="banner" hidden>Showing made-up example contacts so you can see the plan. Upload your HubSpot export to replace them.</div>
       <div class="uploads" style="margin-top:12px">
-        <label class="drop" id="dropCo"><input type="file" id="fileCo" accept=".csv,text/csv"><div class="top"><h3>Companies CSV</h3><span class="pill p-other" id="coPill">Needed</span></div><p class="stat muted" id="coStat">Drop the company segment export here, or tap to choose it.</p></label>
-        <label class="drop" id="dropCt"><input type="file" id="fileCt" accept=".csv,text/csv"><div class="top"><h3>Contacts CSV</h3><span class="pill p-other" id="ctPill">Needed</span></div><p class="stat muted" id="ctStat">Drop the contact segment export here, or tap to choose it.</p></label>
+        <label class="drop" id="dropCt"><input type="file" id="fileCt" accept=".csv,text/csv"><div class="top"><h3>Contact list CSV</h3><span class="pill p-other" id="ctPill">Needed</span></div><p class="stat muted" id="ctStat">Drop the HubSpot export here, or tap to choose it.</p></label>
       </div>
       <div class="settings">
         <div class="field"><label class="label" for="sMin">Contacts per company</label><div style="display:flex;gap:6px;align-items:center"><input id="sMin" type="number" min="1" max="6"><span class="muted">to</span><input id="sMax" type="number" min="1" max="6"></div></div>
         <div class="field"><label class="label" for="sOwner">Company owner</label><select id="sOwner"></select></div>
-        <div class="field" style="align-content:end"><label class="check"><input type="checkbox" id="sCust"> Leave out current customers</label><label class="check"><input type="checkbox" id="sRecent"> Leave out accounts touched in last 7 days</label></div>
+        <div class="field" style="align-content:end"><label class="check"><input type="checkbox" id="sCust"> Leave out current clients and open opportunities</label><label class="check"><input type="checkbox" id="sRecent"> Leave out accounts worked in the last 7 days</label></div>
       </div>
     </div>
     <div class="next"><button class="btn" data-go="1">Back</button><button class="btn primary" data-go="3">Next: review accounts</button></div>
@@ -307,7 +315,7 @@ tr.ex td:first-child,tr.ex td:last-child{opacity:1}
     <div class="strip" id="strip"></div>
     <nav class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="plan" aria-selected="true">Week plan</button>
-      <button class="tab" role="tab" data-tab="finder" aria-selected="false">Find more contacts</button>
+      <button class="tab" role="tab" data-tab="finder" aria-selected="false">Companies needing contacts</button>
       <button class="tab" role="tab" data-tab="scripts" aria-selected="false">Scripts & cadence</button>
     </nav>
     <section class="panel" id="panel"></section>
@@ -347,95 +355,131 @@ function nextMonday(){const now=new Date();const d=new Date(now.getFullYear(),no
 const shortDate=ds=>{const[y,m,d]=ds.split("-").map(Number);return `${m}/${d}`};
 
 /* ---------- column mapping ---------- */
-const MAP_CO={id:["record id","company id","hs object id","object id"],name:["company name","name"],domain:["company domain name","domain","website url","website"],phone:["phone number","company phone","phone"],city:["city"],state:["state region","state","state province"],industry:["industry"],type:["type","company type","organization type"],lifecycle:["lifecycle stage"],owner:["company owner","hubspot owner","owner"],employees:["number of employees","employees","enrollment","student enrollment"],contactsCount:["number of associated contacts","associated contacts"],deals:["number of associated deals","associated deals","number of open deals"],lastActivity:["last activity date"],lastContacted:["last contacted","last contacted date"],lastEngagement:["last engagement date","recent engagement date"],timesContacted:["number of times contacted"],pageviews:["number of pageviews","pageviews","number of sessions"],lastSession:["time of last session","last session","last page seen date"]};
-const MAP_CT={id:["record id","contact id","hs object id","object id"],first:["first name","firstname"],last:["last name","lastname"],email:["email","email address"],phone:["phone number","phone","direct phone"],mobile:["mobile phone number","mobile phone","mobile"],title:["job title","title"],company:["company name","associated company","company"],companyId:["associated company ids","associated company id","primary associated company id","company id","associated company ids primary"],city:["city"],state:["state region","state","state province"],lifecycle:["lifecycle stage"],leadStatus:["lead status"],lastActivity:["last activity date"],lastContacted:["last contacted","last contacted date"],lastEngagement:["last engagement date","recent engagement date"],timesContacted:["number of times contacted"],opens:["marketing emails opened","emails opened"],clicks:["marketing emails clicked","emails clicked"],replies:["marketing emails replied","emails replied"],salesOpened:["recent sales email opened date","sales email last opened"],salesClicked:["recent sales email clicked date","sales email last clicked"],salesReplied:["recent sales email replied date","sales email last replied"],pageviews:["number of pageviews","pageviews"],lastSession:["time of last session","last session"],linkedin:["linkedin url","linkedin profile","linkedin"],unsub:["unsubscribed from all email","opted out of all email"]};
-function mapCols(headers,map){const H=headers.map(h=>({raw:h,n:norm(h)}));const out={},used=new Set();for(const[f,al]of Object.entries(map)){const h=H.find(h=>!used.has(h.raw)&&al.includes(h.n));if(h){out[f]=h.raw;used.add(h.raw)}}for(const[f,al]of Object.entries(map)){if(out[f])continue;const h=H.find(h=>!used.has(h.raw)&&al.some(a=>a.length>4&&h.n.includes(a)));if(h){out[f]=h.raw;used.add(h.raw)}}return out}
+const MAP_CT={id:["record id contact","record id","contact id"],first:["first name","firstname"],last:["last name","lastname"],email:["email","email address"],phone:["phone number","phone","direct phone"],mobile:["mobile phone number","mobile phone"],title:["job title","title"],fn:["job function"],leadStatus:["lead status"],contactOwner:["contact owner"],lastActivity:["last activity date"],lastSend:["last marketing email send date"],lastOpen:["last marketing email open date"],lastClick:["last marketing email click date"],salesClicked:["recent sales email clicked date"],salesOpened:["recent sales email opened date"],salesReplied:["recent sales email replied date"],pageviews:["number of pageviews"],salesActs:["number of sales activities"],lastPage:["last page seen"],linkedin:["linkedin url","linkedin"],unsub:["unsubscribed from all email"],lifecycle:["lifecycle stage"],state:["state region","state"],
+  company:["company name"],companyId:["record id company","associated company ids","associated company id","company id"],coOwner:["company owner"],coPhone:["phone number 1","company phone"],coLastActivity:["last activity date 1"],city:["city"],country:["country region","country"],industry:["industry"],domain:["company domain name","website url"]};
+const NEED_COLS=["email","title","fn","company","companyId","lastOpen","lastActivity"];
+function mapCols(headers,map){const H=headers.map(h=>({raw:h,n:norm(h)}));const out={},used=new Set();for(const[f,al]of Object.entries(map)){const h=H.find(h=>!used.has(h.raw)&&al.includes(h.n));if(h){out[f]=h.raw;used.add(h.raw)}}return out}
 function project(rows,cols){return rows.map(r=>{const o={};for(const[f,h]of Object.entries(cols))o[f]=(r[h]??"").toString().trim();return o})}
 
 /* ---------- classification ---------- */
 const SEG={k12:"K-12 District",higher:"Higher Ed",indep:"Independent School",cte:"CTE / Workforce",other:"Other"};
-function segOf(c){const t=norm([c.name,c.industry,c.type].join(" "));const dom=(c.domain||"").toLowerCase();
+function segOf(c){const t=norm([c.name,c.industry,c.type].join(" "));const dom=(c.dom||"").toLowerCase();
   if(/career|technical|vocational|\bcte\b|boces|workforce|tech center|joint vocational/.test(t))return"cte";
-  if(/school district|public schools|\bisd\b|\busd\b|county schools|city schools|unified|consolidated|k12|k 12|board of education|regional school|parish schools|area schools|community schools|township|primary secondary/.test(t))return"k12";
-  if(/college|university|institute|higher education|school of education/.test(t)||/\.edu$/.test(dom.replace(/\/.*$/,"")))return"higher";
+  if(/school district|public schools|\bisd\b|\busd\b|county schools|city schools|unified|consolidated|k12|k 12|board of education|regional school|parish schools|area schools|community schools|township|primary secondary|geographic district|school system|department of education|school district/.test(t))return"k12";
+  if(/college|university|institute|higher education|higher ed|school of education/.test(t)||/\.edu$/.test(dom))return"higher";
   if(/academy|day school|country day|preparatory|\bprep\b|friends school|episcopal|montessori|independent|\bschool\b/.test(t))return"indep";
   if(/education/.test(t))return"k12";return"other"}
 function tierOf(title){const t=norm(title);if(!t)return 0;
+  if(/assistant to|administrative assistant|secretary|clerk|receptionist/.test(t))return 0;
   if(/assistant principal|vice principal|dean of students|associate principal/.test(t))return 3;
   if(/superintendent|chief|provost|head of school|\bdean\b|vice president|\bvp\b|chancellor|president|executive director|assistant head|associate dean/.test(t))return 1;
   if(/director|induction|mentor|professional (learning|development)|curriculum|instruction|\bchair\b|program (director|coordinator)|clinical|field (experience|placement)|\bcte\b|career and technical|talent|human resources|\bhr\b|leadership development|coordinator|division head/.test(t))return 2;
   if(/principal|coach|faculty|professor|teacher|specialist|lecturer|counselor|instructor/.test(t))return 3;return 0}
 const TIERL={1:"Decision maker",2:"Champion",3:"Influencer",0:"Unclassified"};
-const TARGETS={k12:["Assistant Superintendent for Curriculum & Instruction","Director of Professional Learning","Director of New Teacher Induction & Mentoring","Chief Human Resources / Talent Officer","Director of Leadership Development"],
- higher:["Dean, School/College of Education","Chair, Educational Leadership","Director of Clinical Experiences / Field Placement","Coordinator, School Counseling Program","Assistant Dean for Accreditation (CAEP/AAQEP)"],
- indep:["Head of School","Assistant Head for Academics","Director of Faculty Development","Division Head"],
- cte:["CTE Director","Director of Workforce Programs","Dean of Career & Technical Education","Work-Based Learning Coordinator"],
- other:["Director of Professional Learning","Chief Academic Officer","Director of Talent Development"]};
+/* HubSpot "Job function" values grouped into what SchoolSims sells to */
+function fnGroup(fn){const f=norm(fn);if(!f||f==="0")return"";
+  if(/student/.test(f))return"Student";if(/portal/.test(f))return"Portal admin";
+  if(/higher ed/.test(f))return"Higher ed";if(/professional development/.test(f))return"Professional development";
+  if(/administration district|adminstration district|school district/.test(f))return"District leadership";
+  if(/administration building/.test(f))return"Building leadership";if(/independent/.test(f))return"Independent school leadership";
+  if(/cte|gyo/.test(f))return"CTE / GYO";if(/counsel/.test(f))return"Counseling";if(/board/.test(f))return"School board";
+  if(/teacher/.test(f))return"Teachers";if(/technology/.test(f))return"Technology";if(/business|billing/.test(f))return"Business office";
+  if(/administration|adminsitration/.test(f))return"Administration";return"Other"}
+const FN_TIER={"District leadership":2,"Professional development":2,"Independent school leadership":2,"CTE / GYO":2,"Higher ed":3,"Building leadership":3,"Counseling":3,"Administration":3,"School board":3,"Teachers":3,"Technology":0,"Business office":0,"Other":0};
+/* The job functions each kind of account needs before outreach, and the titles to look for */
+const NEEDS={
+ k12:[{g:"District leadership",titles:["Superintendent","Assistant Superintendent for Curriculum & Instruction","Chief Academic Officer"]},{g:"Professional development",titles:["Director of Professional Learning","New Teacher Induction & Mentoring Coordinator"]}],
+ higher:[{g:"Higher ed leadership",titles:["Dean, School/College of Education","Chair, Teacher Education or Educational Leadership"]},{g:"Higher ed",titles:["Director of Clinical Experiences","Faculty lead for teacher or leader prep courses"]}],
+ indep:[{g:"Independent school leadership",titles:["Head of School","Assistant Head for Academics"]},{g:"Professional development",titles:["Director of Faculty Development"]}],
+ cte:[{g:"CTE / GYO",titles:["CTE Director","Grow Your Own program lead"]},{g:"District leadership",titles:["Assistant Superintendent"]}],
+ other:[{g:"District leadership",titles:["Superintendent","Chief Academic Officer"]},{g:"Professional development",titles:["Director of Professional Learning"]}]};
+const TARGETS=Object.fromEntries(Object.entries(NEEDS).map(([k,v])=>[k,v.flatMap(n=>n.titles)]));
+function covers(p,need){if(need.g==="Higher ed leadership")return p.fnG==="Higher ed"&&(p.tier===1||p.tier===2);return p.fnG===need.g}
+/* time zone from a US phone area code (default: Eastern) */
+const AC={P:"206 209 213 253 279 310 323 341 360 408 415 424 425 442 458 503 509 510 530 541 559 562 564 619 626 628 650 657 661 669 702 707 714 725 747 760 775 805 818 820 831 840 858 909 916 925 949 951 971",
+ M:"208 303 307 385 406 435 505 575 719 720 801 915 970 983",Z:"480 520 602 623 928",
+ C:"205 210 214 217 218 219 224 225 228 251 254 256 262 270 274 281 308 309 312 314 316 318 319 320 325 331 334 337 346 361 364 402 405 409 414 417 430 432 447 464 469 479 501 504 507 512 515 531 534 539 557 563 572 573 580 601 605 608 612 615 618 620 629 630 636 641 651 659 660 662 682 701 708 712 713 715 726 731 737 763 769 773 779 785 806 815 816 817 830 832 847 870 872 901 903 913 918 920 931 936 938 940 945 952 956 972 979 985",
+ A:"907",H:"808"};
+const AC_TZ={};for(const[k,v]of Object.entries(AC))v.split(" ").forEach(c=>AC_TZ[c]={P:"America/Los_Angeles",M:"America/Denver",Z:"America/Phoenix",C:"America/Chicago",A:"America/Anchorage",H:"Pacific/Honolulu"}[k]);
+function areaTz(ph){const d=String(ph||"").replace(/\D/g,"").replace(/^1(?=\d{10})/,"");if(d.length<10)return"";return AC_TZ[d.slice(0,3)]||"America/New_York"}
+const FREE_MAIL=/^(gmail|yahoo|hotmail|outlook|aol|icloud|comcast|msn|live|me)\./;
 
 /* ---------- state ---------- */
-const S={companies:[],contacts:[],sample:true,coFile:null,ctFile:null,coCols:{},ctCols:{},mined:store.get("mined",{}),excluded:store.get("excluded",{}),
+const S={companies:[],contacts:[],sample:true,ctFile:null,ctCols:{},mined:store.get("mined",{}),excluded:store.get("excluded",{}),
   settings:Object.assign({ae:"Janet",phone:"",tz:"America/New_York",week:nextMonday(),per:5,min:2,max:4,owner:"all",cust:true,recent:true,
     goal:350000,pipe:0,close:40,cycle:90,deal:0,m2o:60,a2m:10,lowW:25,low:[11,6,7],perOverride:null},store.get("settings",{})),
-  step:1,tab:"plan",day:0,plan:null,engine:"roles",finding:false,rf:"all",q:""};
+  step:1,tab:"plan",day:0,plan:null,engine:"roles",finding:false,rf:"all",q:"",gapScope:"week"};
 if(S.settings.week<nextMonday())S.settings.week=nextMonday();
 if(!S.settings.v2){if(S.settings.ae==="Janey")S.settings.ae="Janet";if(+S.settings.deal===20000)S.settings.deal=0;S.settings.v2=true;store.set("settings",S.settings)}
 
 /* ---------- scoring ---------- */
-function isCustomer(c){return /customer|evangelist/.test(norm(c.lifecycle+" "+c.type))}
-function scoreContact(p){let s=0;const why=[];const tier=tierOf(p.title);p.tier=tier;
+const recent=(...ds)=>{const v=ds.map(parseDate).filter(Boolean);return v.length?new Date(Math.max(...v)):null};
+function scoreContact(p){let s=0;const why=[];p.fnG=fnGroup(p.fn);p.tier=tierOf(p.title)||FN_TIER[p.fnG]||0;const tier=p.tier;
+  p.skip=!p.email||/bad email|unqualified/i.test(p.leadStatus)||p.fnG==="Student"||p.fnG==="Portal admin"||/^(true|yes|1)$/i.test(String(p.unsub||""));
+  p.dark=/not interested|dark/i.test(p.leadStatus);
   s+=[4,30,22,10][tier];if(tier===1)why.push("Decision maker");else if(tier===2)why.push("Likely champion");
-  const opens=num(p.opens),clicks=num(p.clicks),pv=num(p.pageviews);
-  if(opens){s+=Math.min(10,opens);why.push(`${opens} email opens`)}
-  if(clicks){s+=Math.min(15,clicks*5);why.push(`${clicks} clicks`)}
-  if(num(p.replies)||parseDate(p.salesReplied)){s+=10;why.push("Has replied before")}
-  if(pv){s+=Math.min(10,pv*2);why.push(`${pv} site pageviews`)}
-  const le=daysSince(parseDate(p.lastEngagement)||parseDate(p.salesClicked)||parseDate(p.salesOpened)||parseDate(p.lastSession));
-  if(le!==null&&le<=14){s+=10;why.push(`Engaged ${le}d ago`)}else if(le!==null&&le<=45){s+=5;why.push(`Engaged ${le}d ago`)}
+  const click=daysSince(recent(p.lastClick,p.salesClicked)),open=daysSince(recent(p.lastOpen,p.salesOpened)),pv=num(p.pageviews);
+  if(click!==null&&click<=90){s+=click<=30?18:10;why.push(`Clicked an email ${click}d ago`)}
+  else if(open!==null&&open<=60){s+=open<=21?12:7;why.push(`Opened an email ${open}d ago`)}
+  if(parseDate(p.salesReplied)){s+=8;why.push("Has replied before")}
+  if(pv){s+=Math.min(8,pv*2);why.push(`${pv} site pageviews`)}
   if(p.phone||p.mobile)s+=8;else why.push("No phone on record");
-  if(p.email)s+=5;else s-=10;
-  if(/unqualified|bad timing|do not/.test(norm(p.leadStatus))){s-=15;why.push(`Lead status: ${p.leadStatus}`)}
-  if(/^(true|yes|1)$/i.test(String(p.unsub||"").trim())){s-=40;why.push("Unsubscribed from email")}
-  if(/customer|evangelist/.test(norm(p.lifecycle))){s-=20;why.push("Customer contact")}
-  const lc=daysSince(parseDate(p.lastContacted));if(lc!==null&&lc<=7){s-=10;why.push(`Contacted ${lc}d ago`)}
+  if(p.dark){s-=25;why.push("Lead status: Not interested now")}
+  if(/working with different contact/i.test(p.leadStatus)){s-=12;why.push("Working with a different contact")}
+  const la=daysSince(parseDate(p.lastActivity));p.laDays=la;if(la!==null&&la<=7){s-=10;why.push(`Worked ${la}d ago`)}
+  if(p.skip)s=0;p.eng=(click!==null&&click<=90)||(open!==null&&open<=60);
   p.score=clamp(Math.round(s*1.25),0,100);p.why=why;return p}
-function scoreCompany(c,cts){let s=0;const why=[];const seg=c.seg;
-  if(seg!=="other"){s+=15}
-  const le=daysSince(parseDate(c.lastEngagement)||parseDate(c.lastSession)||parseDate(c.lastActivity));
-  if(le!==null&&le<=14){s+=15;why.push(`Account active ${le}d ago`)}else if(le!==null&&le<=45){s+=10;why.push(`Account active ${le}d ago`)}else if(le!==null&&le<=120)s+=5;
-  const pv=num(c.pageviews);if(pv){s+=Math.min(10,pv*2);why.push(`${pv} site pageviews`)}
-  const eng=cts.reduce((a,p)=>a+num(p.opens)+num(p.clicks)*3+num(p.pageviews),0);if(eng){s+=Math.min(25,eng/2);why.push(`Contacts engaged (${eng} signals)`)}
-  if(cts.some(p=>p.tier===1)){s+=8;why.push("Decision maker on file")}
-  const good=cts.filter(p=>p.tier&&p.email).length;if(good>=2)s+=6;else why.push("Needs more contacts");
-  const lc=daysSince(parseDate(c.lastContacted));if(lc!==null&&lc<=7){s-=20;why.push(`Touched ${lc}d ago`)}else if(lc!==null&&lc<=21)s-=8;else if(lc===null||lc>60){s+=6;why.push(lc===null?"Never contacted":`Quiet ${lc}d`)}
-  if(num(c.deals)>0){s-=6;why.push("Has deal on record, coordinate")}
-  c.score=clamp(Math.round(s*1.3),0,100);c.why=why;c.lcDays=lc;return c}
+function scoreCompany(c){let s=0;const why=[];const cts=c.cts,use=cts.filter(p=>!p.skip);c.use=use;
+  if(c.seg!=="other")s+=10;
+  const le=daysSince(recent(...cts.flatMap(p=>[p.lastOpen,p.lastClick,p.salesClicked,p.salesOpened])));c.leDays=le;
+  if(le!==null&&le<=14){s+=20;why.push(`Opened or clicked ${le}d ago`)}else if(le!==null&&le<=45){s+=14;why.push(`Opened or clicked ${le}d ago`)}else if(le!==null&&le<=120)s+=7;
+  const engN=use.filter(p=>p.eng).length;if(engN){s+=Math.min(15,engN*3);why.push(`${engN} engaged contact${engN>1?"s":""}`)}
+  const pv=[...use].map(p=>num(p.pageviews)).sort((a,b)=>b-a).slice(0,5).reduce((a,b)=>a+b,0);if(pv){s+=Math.min(8,pv);why.push(`${pv} site pageviews`)}
+  if(use.some(p=>p.tier===1&&!p.dark)){s+=8;why.push("Decision maker on file")}
+  c.gaps=NEEDS[c.seg].filter(n=>!use.some(p=>!p.dark&&covers(p,n)));s+=(NEEDS[c.seg].length-c.gaps.length)*4;if(c.gaps.length)why.push(`Missing ${c.gaps.map(g=>g.g.toLowerCase()).join(" & ")}`);
+  const la=cts.map(p=>p.laDays).filter(x=>x!==null);c.touch=la.length?Math.min(...la):null;
+  if(c.touch!==null&&c.touch<=21&&c.touch>7)s-=8;else if(c.touch===null||c.touch>180){s+=6;why.push(c.touch===null?"Never worked":`No sales touch in ${c.touch}d`)}
+  if(use.length&&use.filter(p=>p.dark).length/use.length>.5){s-=8;why.push("Most contacts marked Not interested")}
+  if(c.intl){s-=15;why.push(`International (${c.country})`)}
+  c.score=clamp(Math.round(s*1.25),0,100);c.why=why;return c}
+function companyFlag(c){const ls=c.cts.map(p=>norm(p.leadStatus));
+  if(ls.some(x=>/open sf opportunity/.test(x)))return["cust","Open opportunity in Salesforce"];
+  if(ls.some(x=>/assigned to cx/.test(x))||c.cts.some(p=>p.fnG==="Portal admin"||(p.fnG==="Student"&&/client/i.test(p.fn))))return["cust","Likely current client"];
+  if(ls.some(x=>/ken working|escalate to brian|partnership/.test(x)))return["cust","Being worked by someone else"];
+  return null}
 
-/* ---------- ingest ---------- */
-function ingest(){const co=S.companies,ct=S.contacts;
-  const byId=new Map(),byName=new Map(),byDom=new Map();
-  co.forEach((c,i)=>{c.key=c.id||("n:"+norm(c.name));c.seg=segOf(c);c.st=stateCode(c.state);c.cts=[];if(c.id)byId.set(c.id,c);byName.set(norm(c.name),c);const d=(c.domain||"").toLowerCase().replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/.*$/,"");c.dom=d;if(d)byDom.set(d,c)});
-  ct.forEach(p=>{p.key=p.id||p.email||norm(p.first+p.last);const ids=(p.companyId||"").split(/[;,]/).map(s=>s.trim()).filter(Boolean);let c=ids.map(i=>byId.get(i)).find(Boolean)||byName.get(norm(p.company));if(!c&&p.email){const d=p.email.split("@")[1]?.toLowerCase();if(d)c=byDom.get(d)||[...byDom.entries()].find(([k])=>d.endsWith("."+k))?.[1]}if(c){p.co=c.key;c.cts.push(p)}scoreContact(p);p.st=stateCode(p.state)});
-  co.forEach(c=>scoreCompany(c,c.cts));
+/* ---------- ingest: one contact list -> companies ---------- */
+function ingest(){const by=new Map();
+  S.contacts.forEach(p=>{p.key=p.id||p.email||norm(p.first+p.last);const dom=(p.email.split("@")[1]||"").toLowerCase();
+    const key=p.companyId||("n:"+norm(p.company||dom||"unknown"));if(!by.has(key))by.set(key,{key,id:p.companyId,name:p.company||dom||"Unknown company",owner:p.coOwner,phone:p.coPhone,city:p.city,country:p.country,industry:p.industry,coLast:p.coLastActivity,domain:p.domain,cts:[],doms:{}});
+    const c=by.get(key);c.cts.push(p);if(dom&&!FREE_MAIL.test(dom))c.doms[dom]=(c.doms[dom]||0)+1;p.co=key;scoreContact(p)});
+  const co=[...by.values()];co.forEach(c=>{c.dom=(c.domain||Object.entries(c.doms).sort((a,b)=>b[1]-a[1])[0]?.[0]||"").toLowerCase().replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/.*$/,"");
+    c.st=stateCode(c.city)||stateCode(c.cts.find(p=>p.state)?.state);c.intl=!!c.country&&!/united states|^usa?$/i.test(c.country);
+    c.tz=TZ[c.st]||areaTz(c.phone)||areaTz(c.cts.find(p=>p.phone)?.phone)||"";
+    c.seg=segOf(c);const hi=c.cts.filter(p=>p.fnG==="Higher ed").length;if(hi>c.cts.length/2&&c.seg!=="cte")c.seg="higher";if(c.seg==="other"&&c.cts.some(p=>p.fnG==="Independent school leadership"))c.seg="indep";
+    c.flag=companyFlag(c);scoreCompany(c)});
+  S.companies=co;
   const owners=[...new Set(co.map(c=>c.owner).filter(Boolean))].sort();
-  $("#sOwner").innerHTML=`<option value="all">All owners</option>`+owners.map(o=>`<option ${o===S.settings.owner?"selected":""}>${esc(o)}</option>`).join("");
-  if(S.settings.owner!=="all"&&!owners.includes(S.settings.owner))S.settings.owner="all";
+  $("#sOwner").innerHTML=`<option value="all">All owners</option><option value="__none">Unassigned only</option>`+owners.map(o=>`<option ${o===S.settings.owner?"selected":""}>${esc(o)}</option>`).join("");
+  if(S.settings.owner!=="all"&&S.settings.owner!=="__none"&&!owners.includes(S.settings.owner))S.settings.owner="all";$("#sOwner").value=S.settings.owner;
   build()}
 
 /* ---------- plan ---------- */
 const WIN={k12:{am:[450,510,"Before first bell"],pm:[930,1005,"After dismissal"]},cte:{am:[450,510,"Before first bell"],pm:[930,1005,"After dismissal"]},indep:{am:[465,510,"Before first period"],pm:[930,1005,"After last period"]},higher:{am:[570,660,"Mid-morning, before class blocks"],pm:[840,960,"Afternoon office hours"]},other:{am:[540,600,"Mid-morning"],pm:[840,900,"Mid-afternoon"]}};
 function minedFor(c){return(S.mined[c.key]||[]).map(m=>Object.assign({},m,{key:"m:"+c.key+":"+norm(m.first+m.last+m.title),isMined:true,co:c.key,tier:tierOf(m.title),score:clamp(tierOf(m.title)===1?62:tierOf(m.title)===2?52:35,0,100),why:["Found by contact research","Verify before outreach"]}))}
-function autoReason(c){const st=S.settings;if(st.cust&&isCustomer(c))return"Current customer";if(st.recent&&c.lcDays!==null&&c.lcDays<=7)return`Touched ${c.lcDays}d ago`;if(st.owner!=="all"&&c.owner!==st.owner)return"Different owner";return""}
+function autoReason(c){const st=S.settings;if(st.cust&&c.flag)return c.flag[1];if(st.recent&&c.touch!==null&&c.touch<=7)return`Worked ${c.touch}d ago`;if(st.owner==="__none"&&c.owner)return"Has an owner";if(st.owner!=="all"&&st.owner!=="__none"&&c.owner!==st.owner)return"Different owner";if(!c.use.length)return"No usable contacts";return""}
 function eligible(){return S.companies.filter(c=>!autoReason(c)&&!S.excluded[c.key]).sort((a,b)=>b.score-a.score)}
 function build(){const st=S.settings;S.calc=calc();st.per=st.perOverride||S.calc.rec;const el=eligible();const picks=el.slice(0,st.per*5);
   const days=DOW.map((d,i)=>({i,date:addDays(st.week,i),accts:[]}));
-  picks.forEach((c,idx)=>{const day=days[Math.floor(idx/st.per)];const people=[...c.cts,...minedFor(c)].filter(p=>p.tier!==0||c.cts.length<3).sort((a,b)=>b.score-a.score);
-    const chosen=people.slice(0,st.max);const slots=[];const have=new Set(chosen.map(p=>norm(p.title)));
-    for(const t of TARGETS[c.seg]){if(chosen.length+slots.length>=st.min)break;if(!have.has(norm(t)))slots.push(t)}
+  picks.forEach((c,idx)=>{const day=days[Math.floor(idx/st.per)];const people=[...c.use.filter(p=>!p.dark),...minedFor(c)].filter(p=>p.tier!==0||c.use.length<3).sort((a,b)=>b.score-a.score);
+    const chosen=people.slice(0,st.max);const slots=[];
+    for(const g of c.gaps){if(chosen.length+slots.length>=st.min)break;slots.push(`${g.g}: ${g.titles[0]}`)}
+    if(chosen.length+slots.length<st.min)for(const t of TARGETS[c.seg]){if(chosen.length+slots.length>=st.min)break;if(!chosen.some(p=>norm(p.title)===norm(t))&&!slots.some(x=>x.includes(t)))slots.push(t)}
     day.accts.push({c,people:chosen,slots})});
   days.forEach(schedule);S.plan={days,eligible:el,picks};render()}
 function schedule(day){const st=S.settings;const items=[];
   day.accts.forEach(a=>{const w=WIN[a.c.seg];const list=[...a.people.map(p=>({p,a})),...a.slots.map(t=>({slot:t,a}))];
-    list.forEach(it=>{const tz=TZ[it.p?.st]||TZ[a.c.st]||st.tz;it.tz=tz;it.amLabel=w.am[2];it.pmLabel=w.pm[2];it.amStart=zoned(day.date,w.am[0],tz);it.pmStart=zoned(day.date,w.pm[0],tz);it.amEnd=zoned(day.date,w.am[1],tz);it.pmEnd=zoned(day.date,w.pm[1],tz);items.push(it)})});
+    list.forEach(it=>{const tz=a.c.tz||st.tz;it.tz=tz;it.amLabel=w.am[2];it.pmLabel=w.pm[2];it.amStart=zoned(day.date,w.am[0],tz);it.pmStart=zoned(day.date,w.pm[0],tz);it.amEnd=zoned(day.date,w.am[1],tz);it.pmEnd=zoned(day.date,w.pm[1],tz);items.push(it)})});
   const place=(key,startKey,gap)=>{let cur=0;[...items].sort((x,y)=>x[startKey]-y[startKey]).forEach(it=>{const t=Math.max(cur,it[startKey].getTime());it[key]=new Date(t);cur=t+gap*6e4})};
   place("call1","amStart",4);place("call2","pmStart",6);items.forEach(it=>{it.email=new Date(it.call2.getTime()+4*6e4);it.late=it.call1>it.amEnd||it.call2>it.pmEnd});
   day.items=items;
@@ -475,7 +519,7 @@ function paintMonths(){const st=S.settings;$("#pLow").innerHTML=MON.map((m,i)=>`
 /* ---------- step 3: review ---------- */
 const REASONS=["Open deal or renewal","Recently contacted","Not a fit","Under contract with a competitor","Asked not to be contacted","Bad or duplicate record","Swapped out of plan","Other"];
 function renderReview(){const P=S.plan;if(!P)return;const dayOf=new Map();P.days.forEach(d=>d.accts.forEach(a=>dayOf.set(a.c.key,d.i)));
-  const all=[...S.companies].sort((a,b)=>b.score-a.score);const q=norm(S.q);let rows=all.filter(c=>!q||norm([c.name,c.city,c.st,SEG[c.seg]].join(" ")).includes(q));
+  const all=[...S.companies].sort((a,b)=>b.score-a.score);const q=norm(S.q);let rows=all.filter(c=>!q||norm([c.name,c.city,c.st,c.owner,SEG[c.seg]].join(" ")).includes(q));
   if(S.rf==="plan")rows=rows.filter(c=>dayOf.has(c.key));if(S.rf==="ex")rows=rows.filter(c=>S.excluded[c.key]||autoReason(c));
   const exN=Object.keys(S.excluded).filter(k=>S.companies.some(c=>c.key===k)).length,autoN=all.filter(c=>autoReason(c)).length;
   $("#revSummary").textContent=`${all.length} accounts uploaded · ${P.picks.length} scheduled this week (${S.settings.per} a day) · ${Math.max(0,P.eligible.length-P.picks.length)} waiting for next week · ${exN} excluded by you · ${autoN} left out by filters.`;
@@ -547,35 +591,6 @@ IF CONNECTED ON CALL 1: skip call 2 and the voicemail, send a recap email with t
   return{subjects,email,call,vm}}
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 
-/* ---------- HubSpot prompts ---------- */
-function prompts(){const ae=S.settings.ae||"Janet";
- const co=`Create an active company segment named "SchoolSims Outbound - ${ae}".
-
-Include companies where:
-- Industry is any of: Education Management, Primary/Secondary Education, Higher Education, E-Learning (or Type is School District, College/University, Independent School, CTE Center)
-- Lifecycle stage is NOT Customer or Evangelist
-- Last contacted is more than 14 days ago OR is unknown
-
-Exclude companies where:
-- Number of open deals is greater than 0 (these belong to renewal/upsell work)
-- Closed lost date is in the last 30 days
-
-When the segment is ready, export it to CSV with these properties:
-Record ID, Company name, Company Domain Name, Website URL, Phone Number, City, State/Region, Industry, Type, Lifecycle Stage, Company owner, Number of Employees, Number of Associated Contacts, Number of Associated Deals, Last Activity Date, Last Contacted, Last Engagement Date, Number of times contacted, Number of Pageviews, Time of Last Session.`;
- const ct=`Create a contact segment named "SchoolSims Outbound Contacts - ${ae}". Keep it simple so it stays within the segment builder's limits.
-
-Include contacts where:
-- Associated company's Industry is any of: Education Management, Primary/Secondary Education, Higher Education, E-Learning
-- Email is known
-
-Do not add other filters (no owner, segment-membership, lifecycle stage, lead status or unsubscribe filters). The outbound planner matches contacts to the company export and screens lead status itself.
-
-If this still exceeds the segment builder's limits, skip the segment and export the matching contacts directly as a CSV instead.
-
-Export to CSV with the associated company column and these properties:
-Record ID, First Name, Last Name, Email, Phone Number, Mobile Phone Number, Job Title, Company Name, Associated Company IDs, City, State/Region, Lifecycle Stage, Lead Status, Unsubscribed from all email, Last Activity Date, Last Contacted, Last Engagement Date, Number of times contacted, Marketing emails opened, Marketing emails clicked, Marketing emails replied, Recent Sales Email Opened Date, Recent Sales Email Clicked Date, Recent Sales Email Replied Date, Number of Pageviews, Time of Last Session, LinkedIn URL.`;
- $("#pCompany").textContent=co;$("#pContact").textContent=ct}
-
 /* ---------- render ---------- */
 function segPill(s){return `<span class="pill p-${s}">${SEG[s]}</span>`}
 function tierPill(t){return `<span class="pill t${t||3}">${TIERL[t]}</span>`}
@@ -593,20 +608,24 @@ function renderPlan(){const P=S.plan,st=S.settings;const day=P.days[S.day];const
     `<div class="ev"><div class="t">${fmtT(e.t,tz)}</div><div class="w"><span class="step s-${e.kind}">${e.title}</span><b>${esc(e.who)}</b><div class="muted" style="font-size:12.5px">${esc(e.co)}${e.kind!=="em"?` · ${fmtT(e.kind==="c1"?e.it.call1:e.it.call2,e.it.tz)} local`:""}</div></div></div>`).join("");
   const cards=day.accts.map(a=>{const c=a.c;const rows=day.items.filter(i=>i.a===a);
     const people=rows.filter(r=>r.p).map(r=>{const p=r.p;return `<div class="crow" data-open="${esc(p.key)}" tabindex="0" role="button"><div style="min-width:0"><div><span class="cn">${esc(p.first)} ${esc(p.last)}</span> ${p.isMined?`<span class="pill mined">Found, verify</span>`:""}</div><div class="cmeta">${esc(p.title||"No title")} · ${esc(p.phone||p.mobile||c.phone||"no phone")}${p.email?` · ${esc(p.email)}`:""}</div></div><div style="display:grid;gap:4px;justify-items:end">${tierPill(p.tier)}<div class="ctimes"><span class="mono" title="Call 1">${fmtT(r.call1,st.tz)}</span><span class="mono" title="Call 2 + voicemail + email">${fmtT(r.call2,st.tz)}</span></div></div></div>`}).join("");
-    const slots=rows.filter(r=>!r.p).map(r=>`<div class="slot"><b>Open slot:</b> ${esc(r.slot)}. Call the main line ${esc(c.phone||"")} and ask for this person, or use Find more contacts.</div>`).join("");
-    return `<article class="card acct"><div class="head"><div class="nm"><h3>${esc(c.name)}</h3><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center">${segPill(c.seg)}<span class="muted" style="font-size:13px">${esc([c.city,c.st].filter(Boolean).join(", "))} · ${esc(WIN[c.seg].am[2].toLowerCase())} / ${esc(WIN[c.seg].pm[2].toLowerCase())}</span></div></div><div class="score">${c.score}<small>Priority</small></div></div>
+    const slots=rows.filter(r=>!r.p).map(r=>`<div class="slot"><b>Find a contact:</b> ${esc(r.slot)}. Call the main line ${esc(c.phone||"")} and ask for this person, or see Companies needing contacts.</div>`).join("");
+    return `<article class="card acct"><div class="head"><div class="nm"><h3>${esc(c.name)}</h3><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;align-items:center">${segPill(c.seg)}<span class="muted" style="font-size:13px">${esc([c.city,c.intl?c.country:""].filter(Boolean).join(", "))}${c.owner?` · ${esc(c.owner)}`:" · Unassigned"} · ${esc(WIN[c.seg].am[2].toLowerCase())} / ${esc(WIN[c.seg].pm[2].toLowerCase())}</span></div></div><div class="score">${c.score}<small>Priority</small></div></div>
       <div class="why">${c.why.slice(0,5).map(w=>`<span>${esc(w)}</span>`).join("")}</div>
       <div class="clist">${people||""}</div>${slots}
       <div class="foot"><button class="btn sm" data-mine="${esc(c.key)}">Find contacts</button><button class="btn sm" data-skip="${esc(c.key)}">Swap for next account</button>${c.dom?`<a class="btn sm" href="https://${esc(c.dom)}" target="_blank" rel="noopener">Website</a>`:""}</div></article>`}).join("");
   $("#panel").innerHTML=`<div class="days">${tabs}</div><div class="daygrid"><aside class="card rail"><div style="display:flex;align-items:baseline;gap:8px"><h3>${DOWL[S.day]} schedule</h3><span class="muted" style="font-size:12px">${ab} (your time)</span></div><div class="tl">${tl||`<p class="muted">Nothing scheduled.</p>`}</div></aside><div class="accts">${cards||`<div class="card empty">No accounts on this day.</div>`}</div></div>`}
 function engineInfo(){return{web:["Web research","Searches each account's own website and news for staff pages and returns names, titles and source links."],sample:["Claude suggestions","Claude suggests the highest-value roles and any names it knows publicly. It cannot browse from here, so verify every person before outreach. Deploy to Vercel for live web research."],roles:["Role gaps","Lists the missing high-value roles for each account with ready-made search links. Deploy to Vercel with an API key for live web research."]}[S.engine]}
-function renderFinder(){const[title,desc]=engineInfo();const P=S.plan;const accts=P.days.flatMap(d=>d.accts.map(a=>a.c));
-  const list=accts.map(c=>{const m=S.mined[c.key]||[];const gaps=TARGETS[c.seg].filter(t=>!c.cts.some(p=>norm(p.title).includes(norm(t).split(" ")[0])));
-    const q=encodeURIComponent;const links=gaps.slice(0,3).map(t=>`<a href="https://www.google.com/search?q=${q(`${c.dom?`site:${c.dom} `:`"${c.name}" `}"${t.split(/[,/(]/)[0].trim()}"`)}" target="_blank" rel="noopener">Search: ${esc(t)}</a>`).join(" · ");
-    return `<div class="card"><div class="head" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><h3 style="flex:1;min-width:0">${esc(c.name)}</h3>${segPill(c.seg)}<button class="btn sm" data-mine="${esc(c.key)}">${m.length?"Search again":"Find contacts"}</button></div>
-    <p class="muted" style="font-size:13px;margin-top:6px">${c.cts.length} in HubSpot${c.cts.length?": "+esc(c.cts.slice(0,4).map(p=>p.title||p.first).join(", ")):""}</p>
-    ${m.length?`<div class="found">${m.map((x,j)=>`<div class="frow"><div style="min-width:0"><b>${esc((x.first+" "+x.last).trim()||"Name to confirm")}</b> <span class="muted">· ${esc(x.title)}</span><div class="muted" style="font-size:13px">${esc(x.why||"")}${x.email?` · ${esc(x.email)}`:""}${x.phone?` · ${esc(x.phone)}`:""}</div>${x.source_url?`<a href="${esc(x.source_url)}" target="_blank" rel="noopener">${esc(x.source_url)}</a>`:""}</div><div style="display:grid;gap:4px;justify-items:end"><span class="pill mined">${esc(x.confidence||"verify")}</span><button class="btn sm" data-drop="${esc(c.key)}|${j}">Remove</button></div></div>`).join("")}</div>`:`<p style="font-size:13px;margin-top:8px">${links}</p>`}</div>`}).join("");
-  $("#panel").innerHTML=`<div class="card"><div class="engine"><div class="txt"><span class="label">Research mode</span><h2>${title}</h2><p class="muted">${desc}</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn maroon" id="mineAll" ${S.finding||S.engine==="roles"?"disabled":""}>${S.finding?"Researching…":"Research all "+accts.length+" accounts"}</button>${S.finding?`<button class="btn" id="mineStop">Stop</button>`:""}</div></div><div class="prog" ${S.finding?"":"hidden"}><i id="progBar"></i></div><p class="muted" id="progTxt" style="font-size:13px;margin-top:6px"></p></div><div class="accts" style="margin-top:14px">${list}</div>`}
+function gapList(){const P=S.plan;const wk=P.days.flatMap(d=>d.accts.map(a=>({c:a.c,day:d.i})));
+  const base=S.gapScope==="week"?wk:P.eligible.map(c=>({c,day:wk.find(x=>x.c===c)?.day}));return base.filter(x=>x.c.gaps.length||x.c.use.filter(p=>!p.dark).length<S.settings.min)}
+function renderFinder(){const[title,desc]=engineInfo();const L=gapList();const q=encodeURIComponent;
+  const rows=L.slice(0,150).map(({c,day})=>{const m=S.mined[c.key]||[];const have=c.use.filter(p=>!p.dark);
+    const counts={};have.forEach(p=>{if(p.fnG)counts[p.fnG]=(counts[p.fnG]||0)+1});
+    const needs=c.gaps.length?c.gaps:[{g:"More contacts",titles:TARGETS[c.seg].slice(0,2)}];
+    const look=needs.map(n=>`<div class="need"><span class="pill act-need">${esc(n.g)}</span><div class="nt">${n.titles.map(t=>`<a href="https://www.google.com/search?q=${q(`${c.dom?`site:${c.dom} `:`"${c.name}" `}"${t.split(/[,(]/)[0].trim()}"`)}" target="_blank" rel="noopener">${esc(t)}</a>`).join(" · ")}</div></div>`).join("");
+    return `<article class="card gap"><div class="head" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start"><div style="flex:1;min-width:0"><h3>${esc(c.name)}</h3><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;align-items:center">${segPill(c.seg)}${day!=null?`<span class="pill t1">${DOWL[day]}</span>`:""}<span class="muted" style="font-size:13px">${esc(c.owner||"Unassigned")}${c.phone?` · ${esc(c.phone)}`:""}${c.dom?` · ${esc(c.dom)}`:""}</span></div></div><button class="btn sm" data-mine="${esc(c.key)}">${m.length?"Search again":"Find contacts"}</button></div>
+      <div class="gapgrid"><div><span class="label">Look for</span>${look}</div><div><span class="label">On file (${have.length})</span><p class="muted" style="font-size:13px;margin-top:4px">${Object.entries(counts).map(([k,v])=>`${esc(k)} ${v}`).join(" · ")||"No usable contacts"}${c.cts.length>have.length?` · ${c.cts.length-have.length} not usable (bad email, not interested, student or portal user)`:""}</p></div></div>
+      ${m.length?`<div class="found">${m.map((x,j)=>`<div class="frow"><div style="min-width:0"><b>${esc((x.first+" "+x.last).trim()||"Name to confirm")}</b> <span class="muted">· ${esc(x.title)}</span><div class="muted" style="font-size:13px">${esc(x.why||"")}${x.email?` · ${esc(x.email)}`:""}${x.phone?` · ${esc(x.phone)}`:""}</div>${x.source_url?`<a href="${esc(x.source_url)}" target="_blank" rel="noopener">${esc(x.source_url)}</a>`:""}</div><div style="display:grid;gap:4px;justify-items:end"><span class="pill mined">${esc(x.confidence||"verify")}</span><button class="btn sm" data-drop="${esc(c.key)}|${j}">Remove</button></div></div>`).join("")}</div>`:""}</article>`}).join("");
+  $("#panel").innerHTML=`<div class="card"><div class="engine"><div class="txt"><span class="label">Companies needing contacts</span><h2>${L.length} ${S.gapScope==="week"?"of this week's accounts":"eligible accounts"} are missing a key job function</h2><p class="muted">Each card lists the HubSpot job function that's missing and the titles to look for. Call the main line, check the website, or use Find contacts. Add anyone you confirm to HubSpot with the right Job function so they show up next week. ${esc(desc)}</p></div><div style="display:grid;gap:8px;justify-items:end"><div class="seg sm" role="group"><button data-gs="week" aria-pressed="${S.gapScope==="week"}">This week</button><button data-gs="all" aria-pressed="${S.gapScope==="all"}">All eligible</button></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn maroon" id="mineAll" ${S.finding||S.engine==="roles"?"disabled":""}>${S.finding?"Researching…":"Research this week's accounts"}</button>${S.finding?`<button class="btn" id="mineStop">Stop</button>`:""}</div></div></div><div class="prog" ${S.finding?"":"hidden"}><i id="progBar"></i></div><p class="muted" id="progTxt" style="font-size:13px;margin-top:6px"></p></div><div class="accts" style="margin-top:14px">${rows||`<div class="card empty">Every account has the contacts it needs.</div>`}</div>${L.length>150?`<p class="muted" style="margin-top:10px">Showing the top 150 of ${L.length}. The .xlsx has all of them.</p>`:""}`}
 function renderScripts(){const st=S.settings;const seg=S.scriptSeg||"k12",tier=S.scriptTier??1;
   const demo={first:"{{First name}}",last:"",title:"{{Job title}}",tier};const c={name:"{{Company}}",seg};const sc=scriptsFor(demo,c,st.week);
   const w=WIN[seg];
@@ -637,6 +656,8 @@ document.addEventListener("click",e=>{const t=e.target.closest("button,[data-ope
   if(t.dataset.day){S.day=+t.dataset.day;render();return}
   if(t.dataset.open&&!e.target.closest("a")){openDrawer(t.dataset.open);return}
   if(t.dataset.copy){copyText($("#"+t.dataset.copy).textContent,t);return}
+  if(t.dataset.gs){S.gapScope=t.dataset.gs;render();return}
+  if(t.dataset.copytext){copyText($("#"+t.dataset.copytext).textContent,t);return}
   if(t.dataset.copydoc){copyText($("#doc-"+t.dataset.copydoc).textContent,t);return}
   if(t.dataset.skip){S.excluded[t.dataset.skip]="Swapped out of plan";persist();build();toast("Swapped in the next account. Undo in Step 3.");return}
   if(t.dataset.go){goStep(+t.dataset.go);return}
@@ -651,26 +672,25 @@ document.addEventListener("click",e=>{const t=e.target.closest("button,[data-ope
 document.addEventListener("change",e=>{if(e.target.id==="scSeg"){S.scriptSeg=e.target.value;render()}if(e.target.id==="scTier"){S.scriptTier=+e.target.value;render()}});
 function bindSettings(){const st=S.settings;const f={sAe:"ae",sPhone:"phone",sTz:"tz",sWeek:"week",sMin:"min",sMax:"max",sOwner:"owner",pGoal:"goal",pPipe:"pipe",pClose:"close",pCycle:"cycle",pDeal:"deal",pM2o:"m2o",pA2m:"a2m",pLowW:"lowW"};const NUMS=["goal","pipe","close","cycle","deal","m2o","a2m","lowW"];const MONEY=["goal","pipe","deal"];
   $("#sTz").innerHTML=AE_TZS.map(([v,l])=>`<option value="${v}">${l}</option>`).join("");
-  for(const[id,k]of Object.entries(f)){const el=$("#"+id);el.value=MONEY.includes(k)?(+st[k]?Number(st[k]).toLocaleString("en-US"):""):st[k];el.addEventListener("change",()=>{let v=el.value;if(NUMS.includes(k)){v=Math.max(0,num(v));if(MONEY.includes(k))el.value=v.toLocaleString("en-US");else el.value=v}if(["min","max"].includes(k))v=clamp(parseInt(v)||1,1,6);if(k==="week"&&v){const d=new Date(v+"T12:00:00");const back=(d.getDay()+6)%7;d.setDate(d.getDate()-back);v=d.toISOString().slice(0,10);el.value=v}st[k]=v;if(st.min>st.max){st.max=st.min;$("#sMax").value=st.max}store.set("settings",st);prompts();build()})}
+  for(const[id,k]of Object.entries(f)){const el=$("#"+id);el.value=MONEY.includes(k)?(+st[k]?Number(st[k]).toLocaleString("en-US"):""):st[k];el.addEventListener("change",()=>{let v=el.value;if(NUMS.includes(k)){v=Math.max(0,num(v));if(MONEY.includes(k))el.value=v.toLocaleString("en-US");else el.value=v}if(["min","max"].includes(k))v=clamp(parseInt(v)||1,1,6);if(k==="week"&&v){const d=new Date(v+"T12:00:00");const back=(d.getDay()+6)%7;d.setDate(d.getDate()-back);v=d.toISOString().slice(0,10);el.value=v}st[k]=v;if(st.min>st.max){st.max=st.min;$("#sMax").value=st.max}store.set("settings",st);build()})}
   $("#sCust").checked=st.cust;$("#sRecent").checked=st.recent;
   $("#sCust").onchange=e=>{st.cust=e.target.checked;store.set("settings",st);build()};$("#sRecent").onchange=e=>{st.recent=e.target.checked;store.set("settings",st);build()}}
 
 /* ---------- uploads ---------- */
-function setupDrop(dropId,fileId,kind){const drop=$("#"+dropId),inp=$("#"+fileId);
-  const handle=file=>{if(!file)return;Papa.parse(file,{header:true,skipEmptyLines:true,complete:res=>loadCsv(kind,res.data,res.meta.fields||[],file.name),error:()=>toast("Could not read that file. Export it as CSV and try again.")})};
-  inp.onchange=()=>handle(inp.files[0]);
+function setupDrop(){const drop=$("#dropCt"),inp=$("#fileCt");
+  const handle=file=>{if(!file)return;$("#ctStat").textContent="Reading "+file.name+"…";Papa.parse(file,{header:false,skipEmptyLines:true,complete:res=>{const g=res.data;if(!g.length){toast("That file is empty.");return}const seen={};const hdr=g[0].map(h=>{h=String(h).replace(/^\uFEFF/,"").trim();const n=seen[h]||0;seen[h]=n+1;return n?`${h} ${n}`:h});loadCsv(g.slice(1).map(r=>{const o={};hdr.forEach((h,i)=>o[h]=r[i]??"");return o}),hdr,file.name)},error:()=>toast("Could not read that file. Export it as CSV and try again.")})};
+  inp.onchange=()=>{handle(inp.files[0]);inp.value=""};
   ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over")}));
   ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over")}));
   drop.addEventListener("drop",e=>handle(e.dataTransfer.files[0]))}
-function loadCsv(kind,rows,fields,name){const map=kind==="co"?MAP_CO:MAP_CT;const cols=mapCols(fields,map);
-  if(kind==="co"&&!cols.name){toast("No company name column found. Is this the company export?");return}
-  if(kind==="ct"&&!cols.email&&!cols.first){toast("No name or email column found. Is this the contact export?");return}
-  if(S.sample){S.sample=false;S.companies=[];S.contacts=[];S.coFile=S.ctFile=null;S.mined=store.get("mined",{});S.excluded=store.get("excluded",{})}
-  if(kind==="co"){S.companies=project(rows,cols).filter(c=>c.name);S.coFile=name;S.coCols=cols}else{S.contacts=project(rows,cols).filter(p=>p.email||p.first);S.ctFile=name;S.ctCols=cols}
-  updateDrops();if(S.companies.length)ingest();else{S.plan={days:DOW.map((d,i)=>({i,date:addDays(S.settings.week,i),accts:[],items:[],events:[]})),eligible:[],picks:[]};render()}}
-function updateDrops(){const b=(pill,stat,drop,file,n,cols,map,noun)=>{const miss=Object.keys(map).filter(k=>!cols[k]);$(pill).textContent=file?`${n} ${noun}`:S.sample?"Example data":"Needed";$(pill).className="pill "+(file?"p-indep":S.sample?"mined":"p-other");$(drop).classList.toggle("loaded",!!file);
-  $(stat).innerHTML=file?`<b>${esc(file)}</b> · ${Object.keys(cols).length} of ${Object.keys(map).length} fields matched${miss.length?`<br><span class="muted">Not found: ${esc(miss.slice(0,6).join(", "))}${miss.length>6?"…":""}</span>`:""}`:`Drop the ${noun==="companies"?"company":"contact"} segment export here, or tap to choose it.`};
-  b("#coPill","#coStat","#dropCo",S.coFile,S.companies.length,S.coCols,MAP_CO,"companies");b("#ctPill","#ctStat","#dropCt",S.ctFile,S.contacts.length,S.ctCols,MAP_CT,"contacts");$("#sampleBanner").hidden=!S.sample}
+function loadCsv(rows,fields,name){const cols=mapCols(fields,MAP_CT);
+  if(!cols.email||!cols.company){toast("This doesn't look like the HubSpot contact list. It needs Email and Company name columns.");updateDrops();return}
+  if(S.sample){S.sample=false;S.mined=store.get("mined",{});S.excluded=store.get("excluded",{})}
+  S.contacts=project(rows,cols).filter(p=>p.email||p.first);S.ctFile=name;S.ctCols=cols;ingest();updateDrops();toast(`Loaded ${S.contacts.length.toLocaleString()} contacts at ${S.companies.length.toLocaleString()} companies`)}
+function updateDrops(){const file=S.ctFile,cols=S.ctCols;const miss=NEED_COLS.filter(k=>!cols[k]);
+  $("#ctPill").textContent=file?`${S.contacts.length.toLocaleString()} contacts`:S.sample?"Example data":"Needed";$("#ctPill").className="pill "+(file?"p-indep":S.sample?"mined":"p-other");$("#dropCt").classList.toggle("loaded",!!file);
+  $("#ctStat").innerHTML=file?`<b>${esc(file)}</b> · ${S.companies.length.toLocaleString()} companies${miss.length?`<br><span style="color:var(--warn)">Missing columns: ${esc(miss.map(k=>MAP_CT[k][0].replace(/\b\w/g,m=>m.toUpperCase())).join(", "))}. Add them to the list view in HubSpot and export again for better results.</span>`:""}`:"Drop the HubSpot export here, or tap to choose it.";
+  $("#sampleBanner").hidden=!S.sample}
 
 /* ---------- contact research ---------- */
 let sampleFn=null,downloadsNs=null;
@@ -693,7 +713,7 @@ function storeFound(c,list){const clean=list.filter(x=>x&&x.title).map(x=>({firs
 async function mineOne(key,btn){const c=S.companies.find(x=>x.key===key);if(!c)return;if(S.engine==="roles"){S.tab="finder";render();toast("Use the search links, or deploy with an API key for live research");return}
   btn.disabled=true;btn.textContent="Researching…";try{const ctl=new AbortController();S.ctl=ctl;storeFound(c,await research(c,ctl.signal));build();toast(`${(S.mined[key]||[]).length} contacts found for ${c.name}`)}catch(e){handleMineErr(e);btn.disabled=false;btn.textContent="Find contacts"}}
 function handleMineErr(e){const code=e?.code;if(code==="cancelled")return;if(code==="not_granted"||code==="sampling_disabled"){S.engine="roles";render();toast("Claude access was declined. Showing search links instead.");return}if(code==="rate_limited"){toast("Too many requests. Try again in a minute.");return}toast(e?.message?String(e.message).slice(0,90):"Research failed. Try again.")}
-async function mineAll(){const accts=S.plan.days.flatMap(d=>d.accts.map(a=>a.c));S.finding=true;S.stop=false;render();let done=0;
+async function mineAll(){const accts=S.plan.days.flatMap(d=>d.accts.map(a=>a.c)).filter(c=>c.gaps.length||c.use.length<S.settings.min);S.finding=true;S.stop=false;render();let done=0;
   for(const c of accts){if(S.stop)break;if(S.mined[c.key]?.length){done++;continue}const ctl=new AbortController();S.ctl=ctl;try{storeFound(c,await research(c,ctl.signal))}catch(e){if(e?.code==="cancelled"||S.stop)break;handleMineErr(e);if(["not_granted","sampling_disabled","rate_limited"].includes(e?.code))break}done++;const bar=$("#progBar");if(bar){bar.style.width=(done/accts.length*100)+"%";$("#progTxt").textContent=`${done} of ${accts.length} accounts · ${c.name}`}}
   S.finding=false;build();toast("Contact research finished")}
 
@@ -717,10 +737,10 @@ function buildWorkbook(){const P=S.plan,st=S.settings,tz=st.tz;const wb=XLSX.uti
    ["4. Call 2 (afternoon window, contact's local time): K-12, CTE and Independent 3:30-4:45 PM, after dismissal. Higher Ed 2:00-4:00 PM. If no answer, leave the 25-second voicemail and log Left voicemail."],
    ["5. Email: send within 5 minutes of the voicemail, from HubSpot so it is tracked. Use the subject that references the voicemail. Enroll the contact in your follow-up sequence (day +2 email, day +4 call)."],
    ["6. If you connect on call 1: skip call 2 and the voicemail. Send a recap email with the agreed next step the same day."],
-   ["7. Open contact slots: the account has fewer than 2 good contacts in HubSpot. Call the main line and ask for the role listed, or use the Found Contacts tab. Add anyone you confirm to HubSpot before you email them."],
+   ["7. Find-a-contact rows: the account is missing a key job function in HubSpot. Call the main line and ask for the title listed. The Contacts to Find tab lists every account with gaps and the titles to look for. Add anyone you confirm to HubSpot, with Job function set, before you email them."],
    [""],["LOGGING IN HUBSPOT"],["Call outcomes: Connected, No answer, Left voicemail, Wrong number, Gatekeeper. Log every dial against the contact and the company. Put the hook you used in the call notes."],
    ["Use the Outcome and Notes columns on each day's tab if you work from this file."],[""],
-   ["HOW ACCOUNTS WERE CHOSEN"],["Priority score blends segment fit, recent account and contact engagement (email opens, clicks, replies, site visits), whether a decision maker is on file, and how long since anyone reached out. Customers and accounts touched in the last 7 days are left out."],
+   ["HOW ACCOUNTS WERE CHOSEN"],["Priority score blends segment fit, recent account and contact engagement (email opens, clicks, replies, site visits), whether a decision maker is on file, and how long since anyone reached out. Current clients, open opportunities and accounts worked in the last 7 days are left out."],
    ["Contacts are ranked by persona (decision maker, champion, influencer), engagement and whether a phone number is on file. 2 to 4 per account."]];
   const ws0=sheet(intro,[140],{header:-1});["A1","A4","A13","A17"].forEach(a=>{ws0[a].s={font:{bold:true,sz:a==="A1"?16:12,color:{rgb:a==="A1"?"2D2B6F":"9F354F"}}}});XLSX.utils.book_append_sheet(wb,ws0,"Start Here");
   const r=S.calc||calc();const pm=[["Pipeline math",""],["Annual sales goal",r.goal],["Close rate",st.close/100],["Pipeline needed for the year",Math.round(r.need)],["Current open pipeline",r.pipe],["Pipeline still to create",Math.round(r.gap)],["Sales cycle (days)",+st.cycle],["To create this month",Math.round(r.month)],["Per week",Math.round(r.wk)],["Average new deal",+st.deal||"Not entered"],["New opportunities a week",r.noDeal?"Enter average deal":+r.opps.toFixed(1)],["Meetings that become pipeline",st.m2o/100],["Meetings a week",r.noDeal?"":+r.mtgs.toFixed(1)],["Accounts worked that book a meeting",st.a2m/100],["Accounts to work a week",r.noDeal?"":Math.round(r.accts)],["Recommended companies a day",r.noDeal?"Enter average deal (using 5)":r.rec],["Companies a day used in this plan",st.per],["Slow months",st.low.map(i=>MON[i]).join(", ")+` at ${st.lowW}% of normal`],["",""],["Month","Close target","Pipeline needed","Covered by current pipeline","Still needed","Create by","Pipeline to create in this month"]];
@@ -751,6 +771,10 @@ function buildWorkbook(){const P=S.plan,st=S.settings,tz=st.tz;const wb=XLSX.uti
   XLSX.utils.book_append_sheet(wb,sheet(lib,[16,14,26,34,70,80,60]),"Script Library");
   const m=[["Company","First Name","Last Name","Job Title","Email","Phone Number","Confidence","Why","Source URL","Status"]];for(const c of S.companies)for(const x of S.mined[c.key]||[])m.push([c.name,x.first,x.last,x.title,x.email,x.phone,x.confidence,x.why,x.source_url,"To verify"]);
   XLSX.utils.book_append_sheet(wb,sheet(m,[28,14,16,30,28,15,11,40,40,12]),"Found Contacts");
+  const dayOf=new Map();P.days.forEach(d=>d.accts.forEach(a=>dayOf.set(a.c.key,DOWL[d.i])));
+  const g=[["Company","Scheduled","Segment","Owner","Main phone","Website","Usable contacts","Job function to find","Titles to look for","Search link"]];
+  P.eligible.filter(c=>c.gaps.length||c.use.length<st.min).sort((a,b)=>(dayOf.has(b.key)-dayOf.has(a.key))||(b.score-a.score)).forEach(c=>{(c.gaps.length?c.gaps:[{g:"More contacts",titles:TARGETS[c.seg].slice(0,2)}]).forEach(n=>g.push([c.name,dayOf.get(c.key)||"",SEG[c.seg],c.owner||"Unassigned",c.phone||"",c.dom||"",c.use.filter(p=>!p.dark).length,n.g,n.titles.join("; "),`https://www.google.com/search?q=${encodeURIComponent(`${c.dom?`site:${c.dom} `:`"${c.name}" `}"${n.titles[0].split(/[,(]/)[0].trim()}"`)}`]))});
+  XLSX.utils.book_append_sheet(wb,sheet(g,[34,11,16,20,16,24,10,24,55,50]),"Contacts to Find");
   return wb}
 function exportXlsx(){if(typeof XLSX==="undefined"){toast("The spreadsheet library didn't load. Refresh and try again.");return}if(!S.plan?.picks.length){toast("Upload companies first");return}
   const wb=buildWorkbook();const out=XLSX.write(wb,{bookType:"xlsx",type:"array"});saveFile(`SchoolSims-outbound-week-of-${S.settings.week}.xlsx`,new Uint8Array(out),"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")}
@@ -760,21 +784,22 @@ function exportCsv(){const rows=[["First Name","Last Name","Email","Phone Number
   saveFile(`SchoolSims-found-contacts-${S.settings.week}.csv`,Papa.unparse(rows),"text/csv")}
 $("#btnXlsx").onclick=exportXlsx;$("#btnCsv").onclick=exportCsv;
 
-/* ---------- example data (clearly marked) ---------- */
-function sampleData(){let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;const pick=a=>a[Math.floor(rnd()*a.length)];
-  const orgs=[["Maple Ridge School District","PA","West Chester","Primary/Secondary Education"],["Cedar Valley Unified School District","CA","Fresno","Primary/Secondary Education"],["Riverbend ISD","TX","Round Rock","Primary/Secondary Education"],["Lakeshore Public Schools","MI","Holland","Primary/Secondary Education"],["Harbor County Schools","FL","Sarasota","Primary/Secondary Education"],["Pine Hollow Area School District","PA","Lancaster","Primary/Secondary Education"],["Summit Plains USD","KS","Wichita","Primary/Secondary Education"],["Granite Falls School District","WA","Everett","Primary/Secondary Education"],["Brookhaven City Schools","OH","Dayton","Primary/Secondary Education"],["Willow Creek Community Schools","IN","Carmel","Primary/Secondary Education"],["Red Mesa Unified","AZ","Mesa","Primary/Secondary Education"],["Blue Hill Regional School District","MA","Worcester","Primary/Secondary Education"],["Stonebridge County Public Schools","VA","Leesburg","Primary/Secondary Education"],["Northfield State University","MN","Mankato","Higher Education"],["Ashgrove College","NY","Albany","Higher Education"],["Tidewater State University","VA","Norfolk","Higher Education"],["Silverlake University","CO","Fort Collins","Higher Education"],["Eastbrook Community College","NJ","Edison","Higher Education"],["Alder Point University","OR","Salem","Higher Education"],["Whitmore Country Day School","CT","Greenwich","Education Management"],["St. Aidan's Academy","GA","Atlanta","Education Management"],["Oak Hill Friends School","PA","Media","Education Management"],["Bayview Preparatory School","CA","San Diego","Education Management"],["Tri-County Career & Technical Center","OH","Columbus","Education Management"],["Northern Lakes CTE Center","WI","Green Bay","Education Management"],["Prairie Wind Workforce Institute","NE","Omaha","Education Management"],["Kettle River School District","MN","Duluth","Primary/Secondary Education"],["Coral Springs Charter Network","FL","Coral Springs","Primary/Secondary Education"],["Evergreen Heights School District","WA","Spokane","Primary/Secondary Education"]];
-  const F=["Maria","James","Keisha","David","Priya","Robert","Angela","Luis","Heather","Marcus","Jennifer","Tom","Aisha","Kevin","Laura","Carlos","Nicole","Brian","Denise","Samuel","Rachel","Omar","Megan","Victor","Tanya"],L=["Alvarez","Brennan","Okafor","Hughes","Raman","Fitzgerald","Delgado","Kim","Sorensen","Whitfield","Park","Castillo","Nguyen","Morrison","Patel","Reyes","Grant","Holloway","Ibarra","Lindqvist"];
-  const T={k12:["Superintendent","Assistant Superintendent for Curriculum & Instruction","Director of Professional Learning","Coordinator of New Teacher Induction","Chief Human Resources Officer","Principal","Instructional Coach","Director of Leadership Development"],higher:["Dean, College of Education","Chair, Department of Educational Leadership","Director of Clinical Experiences","Associate Professor of Teacher Education","Coordinator, School Counseling Program","Provost"],indep:["Head of School","Assistant Head for Academics","Director of Faculty Development","Upper School Division Head"],cte:["CTE Director","Director of Workforce Programs","Instructor, Health Sciences","Work-Based Learning Coordinator"]};
-  const ymd=d=>{const t=new Date(Date.now()-d*864e5);return t.toISOString().slice(0,10)};const cos=[],cts=[];
-  orgs.forEach(([name,st,city,ind],i)=>{const dom=norm(name).replace(/ (school district|public schools|schools|university|college|school|center|institute|network|unified|usd|isd)$/,"").replace(/ /g,"")+".example";const id=String(9001+i);
-    const eng=rnd();const c={"Record ID":id,"Company name":name,"Company Domain Name":dom,"Phone Number":`(555) 01${String(10+i).slice(-2)}-${String(1000+i*37).slice(-4)}`,"City":city,"State/Region":st,"Industry":ind,"Lifecycle Stage":i===orgs.length-1?"Customer":pick(["Lead","Marketing Qualified Lead","Opportunity","Lead"]),"Company owner":"Example AE","Number of Associated Deals":rnd()<.15?"1":"0","Last Engagement Date":eng>.3?ymd(Math.floor(rnd()*80)):"","Last Contacted":rnd()<.7?ymd(8+Math.floor(rnd()*150)):"","Number of Pageviews":String(Math.floor(eng*eng*9))};cos.push(c);
-    const seg=segOf({name,industry:ind});const titles=[...T[seg==="other"?"k12":seg]];const n=1+Math.floor(rnd()*4.2);
-    for(let k=0;k<n;k++){const f=pick(F),l=pick(L);const tt=titles.splice(Math.floor(rnd()*titles.length),1)[0];cts.push({"Record ID":String(50000+cts.length),"First Name":f,"Last Name":l,"Email":`${f}.${l}@${dom}`.toLowerCase(),"Phone Number":rnd()<.8?`(555) 02${String(cts.length%90+10)}-${String(2000+cts.length*13).slice(-4)}`:"","Job Title":tt,"Associated Company IDs":id,"State/Region":st,"Lead Status":rnd()<.08?"Unqualified":"Open","Marketing emails opened":String(Math.floor(rnd()*rnd()*14)),"Marketing emails clicked":String(rnd()<.3?1+Math.floor(rnd()*3):0),"Number of Pageviews":String(rnd()<.35?Math.floor(rnd()*6):0),"Last Engagement Date":rnd()<.5?ymd(Math.floor(rnd()*60)):"","Last Contacted":rnd()<.6?ymd(5+Math.floor(rnd()*120)):""})}});
-  return{cos,cts}}
-function loadSample(){const{cos,cts}=sampleData();const cc=mapCols(Object.keys(cos[0]),MAP_CO),pc=mapCols(Object.keys(cts[0]),MAP_CT);S.companies=project(cos,cc);S.contacts=project(cts,pc);S.coCols=cc;S.ctCols=pc;S.sample=true;updateDrops();ingest()}
+/* ---------- example data (made up, clearly marked) ---------- */
+function loadSample(){let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;const pick=a=>a[Math.floor(rnd()*a.length)];
+  const orgs=[["Maple Ridge School District","PA","610"],["Cedar Valley Unified School District","CA","559"],["Riverbend ISD","TX","512"],["Lakeshore Public Schools","MI","616"],["Harbor County Schools","FL","941"],["Pine Hollow Area School District","PA","717"],["Summit Plains USD","KS","316"],["Granite Falls School District","WA","425"],["Brookhaven City Schools","OH","937"],["Willow Creek Community Schools","IN","317"],["Blue Hill Regional School District","MA","508"],["Northfield State University","MN","507"],["Ashgrove College","NY","518"],["Tidewater State University","VA","757"],["Silverlake University","CO","970"],["Eastbrook Community College","NJ","732"],["Whitmore Country Day School","CT","203"],["St. Aidan's Academy","GA","404"],["Tri-County Career & Technical Center","OH","614"],["Northern Lakes CTE Center","WI","920"],["Kettle River School District","MN","218"],["Evergreen Heights School District","WA","509"]];
+  const F=["Maria","James","Keisha","David","Priya","Robert","Angela","Luis","Heather","Marcus","Jennifer","Tom","Aisha","Kevin","Laura","Carlos","Nicole","Denise","Samuel","Rachel","Omar","Megan"],L=["Alvarez","Brennan","Okafor","Hughes","Raman","Fitzgerald","Delgado","Kim","Sorensen","Whitfield","Park","Castillo","Nguyen","Morrison","Patel","Reyes","Grant","Holloway"];
+  const T={k12:[["Superintendent","Administration-District"],["Assistant Superintendent for Curriculum & Instruction","Administration-District"],["Director of Professional Learning","Professional Development"],["New Teacher Induction Coordinator","Professional Development"],["Principal","Administration-Building"],["Principal","Administration-Building"],["Instructional Technology Specialist","Technology"]],
+   higher:[["Dean, College of Education","Higher Ed Faculty"],["Chair, Educational Leadership","Higher Ed Faculty: LeaderSims"],["Associate Professor of Teacher Education","Higher Ed Faculty: TeacherSims"],["Director of Clinical Experiences","Higher Ed Faculty"]],
+   indep:[["Head of School","Administration-Independent"],["Assistant Head for Academics","Administration-Independent"],["Director of Faculty Development","Professional Development"]],
+   cte:[["CTE Director","CTE/GYO"],["Grow Your Own Program Coordinator","CTE/GYO"],["Assistant Superintendent","Administration-District"]]};
+  const owners=["Janet Jaramillo","Janet Jaramillo","","Brent Coulson",""];const ts=d=>{const t=new Date(Date.now()-d*864e5);return t.toISOString().slice(0,10)+" 09:15"};
+  const rows=[];orgs.forEach(([name,st,ac],i)=>{const dom=norm(name).replace(/ (school district|public schools|schools|university|college|school|center|district|academy|isd|usd)$/,"").replace(/ /g,"")+".example";const id=String(9001+i);const seg=segOf({name});const pool=[...T[seg==="other"?"k12":seg]];const n=1+Math.floor(rnd()*4.4);const owner=owners[i%owners.length];const hot=rnd();
+    for(let k=0;k<n&&pool.length;k++){const[tt,fn]=pool.splice(Math.floor(rnd()*pool.length),1)[0];const f=pick(F),l=pick(L);
+      rows.push({"Record ID - Contact":String(50000+rows.length),"First Name":f,"Last Name":l,"Lead Status":rnd()<.08?"Not interested now/Dark":"","Job Title":tt,"Job function":fn,"Contact owner":owner,"Email":`${f}.${l}@${dom}`.toLowerCase(),"Phone Number":rnd()<.8?`${ac}-555-${String(1000+rows.length*37).slice(-4)}`:"","Last Activity Date":rnd()<.5?ts(8+Math.floor(rnd()*300)):"","Number of Pageviews":String(rnd()<.3?Math.floor(rnd()*6):0),"Recent Sales Email Clicked Date":hot>.7&&rnd()<.5?ts(Math.floor(rnd()*40)):"","Last marketing email click date":hot>.6&&rnd()<.3?ts(Math.floor(rnd()*80)):"","Last marketing email open date":rnd()<.6?ts(Math.floor(rnd()*hot*120)):"","Record ID - Company":id,"Company name":name,"Company owner":owner,"Phone Number.1":`${ac}-555-0100`,"City":st,"Country/Region":"United States","Industry":seg==="higher"?"Higher Education":"Education Management"})}});
+  const cols=mapCols(Object.keys(rows[0]),MAP_CT);S.contacts=project(rows,cols);S.ctCols={};S.ctFile=null;S.sample=true;updateDrops();ingest()}
 
 /* ---------- init ---------- */
-bindSettings();prompts();setupDrop("dropCo","fileCo","co");setupDrop("dropCt","fileCt","ct");
+bindSettings();setupDrop();
 if(typeof Papa==="undefined"){document.querySelector("#step2").insertAdjacentHTML("afterbegin",`<div class="banner">The CSV reader didn't load. Check your connection and refresh.</div>`)}
 S.mined={};S.excluded={};
 paintMonths();loadSample();goStep(1);detectEngine();
