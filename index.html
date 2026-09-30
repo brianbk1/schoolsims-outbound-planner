@@ -552,7 +552,6 @@ function prompts(){const ae=S.settings.ae||"Janet";
  const co=`Create an active company segment named "SchoolSims Outbound - ${ae}".
 
 Include companies where:
-- Company owner is ${ae}
 - Industry is any of: Education Management, Primary/Secondary Education, Higher Education, E-Learning (or Type is School District, College/University, Independent School, CTE Center)
 - Lifecycle stage is NOT Customer or Evangelist
 - Last contacted is more than 14 days ago OR is unknown
@@ -566,10 +565,10 @@ Record ID, Company name, Company Domain Name, Website URL, Phone Number, City, S
  const ct=`Create a contact segment named "SchoolSims Outbound Contacts - ${ae}". Keep it simple so it stays within the segment builder's limits.
 
 Include contacts where:
-- Associated company's Company owner is ${ae}
+- Associated company's Industry is any of: Education Management, Primary/Secondary Education, Higher Education, E-Learning
 - Email is known
 
-Do not add other filters (no segment-membership filter, lifecycle stage, lead status or unsubscribe filters). The outbound planner matches contacts to the company export and screens lead status itself.
+Do not add other filters (no owner, segment-membership, lifecycle stage, lead status or unsubscribe filters). The outbound planner matches contacts to the company export and screens lead status itself.
 
 If this still exceeds the segment builder's limits, skip the segment and export the matching contacts directly as a CSV instead.
 
