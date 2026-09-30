@@ -1,0 +1,7 @@
+{
+  "name": "schoolsims-outbound-planner",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SchoolSims AE outbound planner: HubSpot CSVs in, weekly call plan and xlsx out",
+  "engines": { "node": ">=18" }
+}
